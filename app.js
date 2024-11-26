@@ -25,7 +25,9 @@ async function handleMessage(context) {
   const userMessage = context.activity.text.trim();
 
   if (userMessage === "/process") {
-    await context.sendActivity("You triggered the /process command!");
+    await context.sendActivity(
+      "You triggered the /process command! Testing worksheet being processed..."
+    );
     console.log(
       "Process command triggered - Testing worksheet being processed..."
     );
