@@ -32,6 +32,7 @@ async function handleMessage(context) {
       "Process command triggered - Testing worksheet being processed..."
     );
   } else {
+    console.log(`You said: ${userMessage}`);
     await context.sendActivity(`You said: ${userMessage}`);
   }
 }
