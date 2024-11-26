@@ -22,7 +22,9 @@ adapter.onTurnError = async (context, error) => {
 
 // Simple bot logic
 async function handleMessage(context) {
-  const userMessage = context.activity.text.trim();
+  // console.log("Received activity:", context.activity);
+
+  const userMessage = context.activity.text?.trim();
 
   if (userMessage === "/process") {
     await context.sendActivity(
@@ -31,7 +33,52 @@ async function handleMessage(context) {
     console.log(
       "Process command triggered - Testing worksheet being processed..."
     );
-  } else {
+  } else if (
+    context.activity.type === "message" &&
+    context.activity.value?.action === "selectFile"
+  ) {
+    const selectedFile = context.activity.value.fileChoice;
+    await context.sendActivity(`You selected: ${selectedFile}`);
+    console.log(`File selected: ${selectedFile}`);
+  } else if (userMessage === "/files") {
+    const card = {
+      type: "AdaptiveCard",
+      body: [
+        {
+          type: "TextBlock",
+          text: "Please select a file:",
+        },
+        {
+          type: "Input.ChoiceSet",
+          id: "fileChoice",
+          style: "compact",
+          choices: [
+            { title: "File 1", value: "file1.txt" },
+            { title: "File 2", value: "file2.txt" },
+            { title: "File 3", value: "file3.txt" },
+          ],
+        },
+      ],
+      actions: [
+        {
+          type: "Action.Submit",
+          title: "Submit",
+          data: { action: "selectFile" },
+        },
+      ],
+      $schema: "http://adaptivecards.io/schemas/adaptive-card",
+      version: "1.2",
+    };
+
+    await context.sendActivity({
+      attachments: [
+        {
+          contentType: "application/vnd.microsoft.card.adaptive",
+          content: card,
+        },
+      ],
+    });
+  } else if (userMessage) {
     console.log(`You said: ${userMessage}`);
     await context.sendActivity(`You said: ${userMessage}`);
   }
