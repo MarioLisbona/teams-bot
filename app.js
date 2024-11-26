@@ -24,9 +24,11 @@ adapter.onTurnError = async (context, error) => {
 async function handleMessage(context) {
   const userMessage = context.activity.text.trim();
 
-  if (userMessage === "/daily") {
-    await context.sendActivity("You triggered the /daily command!");
-    console.log("Daily command triggered");
+  if (userMessage === "/process") {
+    await context.sendActivity("You triggered the /process command!");
+    console.log(
+      "Process command triggered - Testing worksheet being processed..."
+    );
   } else {
     await context.sendActivity(`You said: ${userMessage}`);
   }
