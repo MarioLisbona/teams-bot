@@ -2,23 +2,14 @@ import express from "express";
 import { BotFrameworkAdapter, TurnContext } from "botbuilder";
 import dotenv from "dotenv";
 import { getFileNamesAndIds } from "./lib/oneDrive.js";
+import { createBotAdapter } from "./lib/createBotAdapter.js";
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3978;
 
-// Create the BotFrameworkAdapter
-const adapter = new BotFrameworkAdapter({
-  appId: process.env.MICROSOFT_APP_ID,
-  appPassword: process.env.MICROSOFT_APP_PASSWORD,
-});
-
-// Error handling
-adapter.onTurnError = async (context, error) => {
-  console.error(`[onTurnError]: ${error}`);
-  await context.sendActivity("Oops, something went wrong!");
-};
+const adapter = await createBotAdapter();
 
 // Simple bot logic
 async function handleMessage(context) {
