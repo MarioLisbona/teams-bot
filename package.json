@@ -12,6 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@azure/identity": "^4.5.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "botbuilder": "^4.23.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.1"
