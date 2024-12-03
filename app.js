@@ -28,7 +28,7 @@ async function handleMessage(context) {
 
   if (
     context.activity.type === "message" &&
-    context.activity.value?.action === "selectFile"
+    context.activity.value?.action === "selectClientWorkbook"
   ) {
     const selectedFileData = JSON.parse(context.activity.value.fileChoice);
     await context.sendActivity(`You selected: ${selectedFileData.name}`);
@@ -63,7 +63,7 @@ async function handleMessage(context) {
         {
           type: "Action.Submit",
           title: "Submit",
-          data: { action: "selectFile" },
+          data: { action: "selectClientWorkbook" },
         },
       ],
       $schema: "http://adaptivecards.io/schemas/adaptive-card",
