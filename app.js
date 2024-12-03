@@ -22,7 +22,10 @@ async function handleMessage(context) {
     context.activity.value?.action === "selectClientWorkbook"
   ) {
     const selectedFileData = JSON.parse(context.activity.value.fileChoice);
-    await context.sendActivity(`You selected: ${selectedFileData.name}`);
+    const fileId = selectedFileData.id;
+    await context.sendActivity(
+      `Processing the Testing worksheet in ${selectedFileData.name}...`
+    );
     console.log(
       `File selected - Name: ${selectedFileData.name}, ID: ${selectedFileData.id}`
     );
