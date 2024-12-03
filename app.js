@@ -18,12 +18,6 @@ const adapter = await createBotAdapter();
 async function handleMessage(context) {
   // console.log("Received activity:", context.activity);
 
-  // Create a Graph client with caching disabled
-  const client = await getGraphClient({ cache: false });
-
-  const userId = process.env.USER_ID;
-  const testingSheetName = "Testing";
-
   const userMessage = context.activity.text?.trim();
 
   if (
