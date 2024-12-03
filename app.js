@@ -80,7 +80,6 @@ async function handleMessage(context) {
     });
   } else if (context.activity.value?.action === "createRFI") {
     const clientName = context.activity.value.clientName;
-    processRFISpreadsheet(clientName);
     await context.sendActivity(
       `Starting RFI spreadsheet creation for ${clientName}...`
     );
@@ -90,14 +89,20 @@ async function handleMessage(context) {
       context.activity
     );
 
-    // Add 5 second timeout and completion message
-    setTimeout(async () => {
-      // Create a new context for the delayed message
-      const newContext = await adapter.createContext(conversationReference);
+    // Process the spreadsheet and wait for completion
+    const success = await processRFISpreadsheet(clientName);
+    // Create a new context for the completion message
+    const newContext = await adapter.createContext(conversationReference);
+
+    if (success) {
       await newContext.sendActivity(
         `RFI spreadsheet creation completed for ${clientName}!`
       );
-    }, 5000);
+    } else {
+      await newContext.sendActivity(
+        `RFI spreadsheet creation failed for ${clientName}!`
+      );
+    }
   } else if (userMessage) {
     console.log(`You said: ${userMessage}`);
     await context.sendActivity(`You said: ${userMessage}`);
@@ -195,7 +200,7 @@ async function processRFISpreadsheet(clientName) {
     setTimeout(() => {
       // Simulate processing completion
       console.log(`Completed processing for ${clientName}`);
-      resolve(true);
+      resolve(false);
     }, 5000);
   });
 }
