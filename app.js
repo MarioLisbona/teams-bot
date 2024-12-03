@@ -6,6 +6,10 @@ import { createBotAdapter } from "./lib/createBotAdapter.js";
 import { getGraphClient } from "./lib/msAuth.js";
 import { processTesting } from "./lib/worksheetProcessing.js";
 import { processTestingWorksheet } from "./lib/botProcessing.js";
+import {
+  createUpdatedCard,
+  createFileSelectionCard,
+} from "./lib/adaptiveCards.js";
 dotenv.config();
 
 const app = express();
@@ -48,30 +52,10 @@ async function handleMessage(context) {
       );
 
       // Update the card to show it's been processed
-      const updatedCard = {
-        type: "AdaptiveCard",
-        body: [
-          {
-            type: "TextBlock",
-            text: "RFI Processing Complete",
-            weight: "bolder",
-          },
-          {
-            type: "TextBlock",
-            textFormat: "markdown",
-            text: `✅ Processed workbook: **${selectedFileData.name}**`,
-            wrap: true,
-          },
-          {
-            type: "TextBlock",
-            textFormat: "markdown",
-            text: `🛠️ Client RFI spreadsheet created:\n\n**${newWorkbookName}**`,
-            wrap: true,
-          },
-        ],
-        $schema: "http://adaptivecards.io/schemas/adaptive-card",
-        version: "1.2",
-      };
+      const updatedCard = await createUpdatedCard(
+        selectedFileData,
+        newWorkbookName
+      );
 
       await context.updateActivity({
         type: "message",
@@ -91,51 +75,14 @@ async function handleMessage(context) {
         return;
       }
 
-      const card = {
-        type: "AdaptiveCard",
-        body: [
-          {
-            type: "TextBlock",
-            text: "Process Testing Worksheet",
-            weight: "bolder",
-            size: "medium",
-          },
-          {
-            type: "TextBlock",
-            text: "Please select the client workbook you would like to process:",
-            wrap: true,
-          },
-          {
-            type: "Input.ChoiceSet",
-            id: "fileChoice",
-            style: "compact",
-            isRequired: true,
-            choices: files.map((file) => ({
-              title: file.name,
-              value: JSON.stringify({ name: file.name, id: file.id }),
-            })),
-          },
-        ],
-        actions: [
-          {
-            type: "Action.Submit",
-            title: "Process Worksheet",
-            data: {
-              action: "selectClientWorkbook",
-              timestamp: Date.now(), // Add timestamp to prevent reuse
-            },
-            style: "positive",
-          },
-        ],
-        $schema: "http://adaptivecards.io/schemas/adaptive-card",
-        version: "1.2",
-      };
+      // Create the file selection card
+      const fileSelectionCard = await createFileSelectionCard(files);
 
       await context.sendActivity({
         attachments: [
           {
             contentType: "application/vnd.microsoft.card.adaptive",
-            content: card,
+            content: fileSelectionCard,
           },
         ],
       });
