@@ -32,8 +32,18 @@ async function handleMessage(context) {
   ) {
     const selectedFileData = JSON.parse(context.activity.value.fileChoice);
 
+    // Immediately respond to the card interaction
+    await context.sendActivity({
+      type: "invokeResponse",
+      value: {
+        status: 200,
+        body: {},
+      },
+    });
+
+    // Then delegate to the processing function
     await processTestingWorksheet(context, adapter, selectedFileData);
-  } else if (userMessage === "/p") {
+  } else if (userMessage === "/pt") {
     const files = await getFileNamesAndIds(process.env.ONEDRIVE_ID);
 
     const card = {
