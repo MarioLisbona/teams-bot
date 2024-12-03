@@ -5,6 +5,7 @@ import { getFileNamesAndIds } from "./lib/oneDrive.js";
 import { createBotAdapter } from "./lib/createBotAdapter.js";
 import { getGraphClient } from "./lib/msAuth.js";
 import { processTesting } from "./lib/worksheetProcessing.js";
+import { processTestingWorksheet } from "./lib/botProcessing.js";
 dotenv.config();
 
 const app = express();
@@ -30,59 +31,9 @@ async function handleMessage(context) {
     context.activity.value?.action === "selectClientWorkbook"
   ) {
     const selectedFileData = JSON.parse(context.activity.value.fileChoice);
-    const workbookId = selectedFileData.id;
 
-    // Store the conversation reference for later updates
-    const conversationReference = TurnContext.getConversationReference(
-      context.activity
-    );
-
-    // Immediately respond to the card interaction
-    await context.sendActivity({
-      type: "invokeResponse",
-      value: {
-        status: 200,
-        body: {},
-      },
-    });
-
-    try {
-      // Initial notification
-      await context.sendActivity({
-        type: "message",
-        textFormat: "markdown",
-        text: `⏳ Starting to process the Testing worksheet in **${selectedFileData.name}**...`,
-      });
-
-      // Process the testing sheet and return the updated RFI cell data
-      const updatedRfiCellData = await processTesting(
-        client,
-        userId,
-        workbookId,
-        testingSheetName
-      );
-
-      console.log({ updatedRfiCellData });
-
-      // Create a new context for the completion message to avoid timing issues
-      const newContext = await adapter.createContext(conversationReference);
-      await newContext.sendActivity({
-        type: "message",
-        textFormat: "markdown",
-        text: `✅ Processing completed successfully for **${selectedFileData.name}**!`,
-      });
-    } catch (error) {
-      console.error("Processing error:", error);
-
-      // Create a new context for the error message
-      const newContext = await adapter.createContext(conversationReference);
-      await newContext.sendActivity({
-        type: "message",
-        textFormat: "markdown",
-        text: `❌ An error occurred while processing **${selectedFileData.name}**. Please try again.`,
-      });
-    }
-  } else if (userMessage === "/process") {
+    await processTestingWorksheet(context, adapter, selectedFileData);
+  } else if (userMessage === "/p") {
     const files = await getFileNamesAndIds(process.env.ONEDRIVE_ID);
 
     const card = {
