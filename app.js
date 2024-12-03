@@ -16,98 +16,161 @@ const adapter = await createBotAdapter();
 
 // Simple bot logic
 async function handleMessage(context) {
-  // console.log("Received activity:", context.activity);
-
   const userMessage = context.activity.text?.trim();
 
-  if (
-    context.activity.type === "message" &&
-    context.activity.value?.action === "selectClientWorkbook"
-  ) {
-    const selectedFileData = JSON.parse(context.activity.value.fileChoice);
+  try {
+    if (
+      context.activity.type === "message" &&
+      context.activity.value?.action === "selectClientWorkbook"
+    ) {
+      const selectedFileData = JSON.parse(context.activity.value.fileChoice);
 
-    // Immediately respond to the card interaction
-    await context.sendActivity({
-      type: "invokeResponse",
-      value: {
-        status: 200,
-        body: {},
-      },
-    });
+      // Immediately respond to the card interaction
+      if (
+        context.activity.type === "invoke" ||
+        context.activity.name === "adaptiveCard/action"
+      ) {
+        await context.sendActivity({
+          type: "invokeResponse",
+          value: {
+            statusCode: 200,
+            type: "application/vnd.microsoft.activity.message",
+            value: "Processing...",
+          },
+        });
+      }
 
-    // Then delegate to the processing function
-    await processTestingWorksheet(context, adapter, selectedFileData);
-  } else if (userMessage === "/pt") {
-    const files = await getFileNamesAndIds(process.env.ONEDRIVE_ID);
-
-    const card = {
-      type: "AdaptiveCard",
-      body: [
-        {
-          type: "TextBlock",
-          text: "Process Testing Worksheet",
-        },
-        {
-          type: "TextBlock",
-          text: "Please select the client workbook you would like to process:",
-        },
-        {
-          type: "Input.ChoiceSet",
-          id: "fileChoice",
-          style: "compact",
-          choices: files.map((file) => ({
-            title: file.name,
-            value: JSON.stringify({ name: file.name, id: file.id }),
-          })),
-        },
-      ],
-      actions: [
-        {
-          type: "Action.Submit",
-          title: "Submit",
-          data: { action: "selectClientWorkbook" },
-        },
-      ],
-      $schema: "http://adaptivecards.io/schemas/adaptive-card",
-      version: "1.2",
-    };
-
-    await context.sendActivity({
-      attachments: [
-        {
-          contentType: "application/vnd.microsoft.card.adaptive",
-          content: card,
-        },
-      ],
-    });
-  } else if (context.activity.value?.action === "createRFI") {
-    const clientWorkbookId = context.activity.value.clientWorkbookId;
-    await context.sendActivity(
-      `Starting RFI spreadsheet creation for ${clientWorkbookId}...`
-    );
-
-    // Store the conversation reference for later use
-    const conversationReference = TurnContext.getConversationReference(
-      context.activity
-    );
-
-    // Process the spreadsheet and wait for completion
-    const success = await processRFISpreadsheet(clientName);
-    // Create a new context for the completion message
-    const newContext = await adapter.createContext(conversationReference);
-
-    if (success) {
-      await newContext.sendActivity(
-        `RFI spreadsheet creation completed for ${clientName}!`
+      // Then delegate to the processing function
+      const newWorkbookName = await processTestingWorksheet(
+        context,
+        adapter,
+        selectedFileData
       );
-    } else {
-      await newContext.sendActivity(
-        `RFI spreadsheet creation failed for ${clientName}!`
+
+      // Update the card to show it's been processed
+      const updatedCard = {
+        type: "AdaptiveCard",
+        body: [
+          {
+            type: "TextBlock",
+            text: "RFI Processing Complete",
+            weight: "bolder",
+          },
+          {
+            type: "TextBlock",
+            textFormat: "markdown",
+            text: `✅ Processed workbook: **${selectedFileData.name}**`,
+            wrap: true,
+          },
+          {
+            type: "TextBlock",
+            textFormat: "markdown",
+            text: `🛠️ Client RFI spreadsheet created:\n\n**${newWorkbookName}**`,
+            wrap: true,
+          },
+        ],
+        $schema: "http://adaptivecards.io/schemas/adaptive-card",
+        version: "1.2",
+      };
+
+      await context.updateActivity({
+        type: "message",
+        id: context.activity.replyToId,
+        attachments: [
+          {
+            contentType: "application/vnd.microsoft.card.adaptive",
+            content: updatedCard,
+          },
+        ],
+      });
+    } else if (userMessage === "/pt") {
+      const files = await getFileNamesAndIds(process.env.ONEDRIVE_ID);
+
+      if (!files || files.length === 0) {
+        await context.sendActivity("No workbooks found in OneDrive.");
+        return;
+      }
+
+      const card = {
+        type: "AdaptiveCard",
+        body: [
+          {
+            type: "TextBlock",
+            text: "Process Testing Worksheet",
+            weight: "bolder",
+            size: "medium",
+          },
+          {
+            type: "TextBlock",
+            text: "Please select the client workbook you would like to process:",
+            wrap: true,
+          },
+          {
+            type: "Input.ChoiceSet",
+            id: "fileChoice",
+            style: "compact",
+            isRequired: true,
+            choices: files.map((file) => ({
+              title: file.name,
+              value: JSON.stringify({ name: file.name, id: file.id }),
+            })),
+          },
+        ],
+        actions: [
+          {
+            type: "Action.Submit",
+            title: "Process Worksheet",
+            data: {
+              action: "selectClientWorkbook",
+              timestamp: Date.now(), // Add timestamp to prevent reuse
+            },
+            style: "positive",
+          },
+        ],
+        $schema: "http://adaptivecards.io/schemas/adaptive-card",
+        version: "1.2",
+      };
+
+      await context.sendActivity({
+        attachments: [
+          {
+            contentType: "application/vnd.microsoft.card.adaptive",
+            content: card,
+          },
+        ],
+      });
+    } else if (context.activity.value?.action === "createRFI") {
+      const clientWorkbookId = context.activity.value.clientWorkbookId;
+      if (!clientWorkbookId) {
+        await context.sendActivity("Error: Missing workbook ID");
+        return;
+      }
+
+      await context.sendActivity(
+        `Starting RFI spreadsheet creation for ${clientWorkbookId}...`
       );
+
+      // Store the conversation reference for later use
+      const conversationReference = TurnContext.getConversationReference(
+        context.activity
+      );
+    } else if (userMessage) {
+      // Handle other text messages
+      if (userMessage.toLowerCase() === "help") {
+        await context.sendActivity(
+          "Available commands:\n" +
+            "• /pt - Process the Testing Worksheet from a client workbook\n" +
+            "• help - Show this help message"
+        );
+      } else {
+        await context.sendActivity(`Echo: ${userMessage}`);
+      }
     }
-  } else if (userMessage) {
-    console.log(`You said: ${userMessage}`);
-    await context.sendActivity(`You said: ${userMessage}`);
+  } catch (error) {
+    console.error("Handler Error:", error);
+    await context.sendActivity(
+      "❌ An error occurred while processing your request. Please try again or contact support."
+    );
   }
 }
 
@@ -193,16 +256,3 @@ app.listen(port, () => {
     `\nBot is running on http://localhost:${port}/api/messages\nServer is running on http://localhost:${port}/`
   );
 });
-
-// Add this function to handle the background processing
-async function processRFISpreadsheet(clientName) {
-  console.log(`Processing RFI spreadsheet for ${clientName}`);
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Simulate processing completion
-      console.log(`Completed processing for ${clientName}`);
-      resolve(false);
-    }, 5000);
-  });
-}
