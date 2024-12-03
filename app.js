@@ -1,7 +1,7 @@
 import express from "express";
 import { BotFrameworkAdapter, TurnContext } from "botbuilder";
 import dotenv from "dotenv";
-
+import { getFileNamesAndIds } from "./lib/oneDrive.js";
 dotenv.config();
 
 const app = express();
@@ -26,37 +26,37 @@ async function handleMessage(context) {
 
   const userMessage = context.activity.text?.trim();
 
-  if (userMessage === "/process") {
-    await context.sendActivity(
-      "You triggered the /process command! Testing worksheet being processed..."
-    );
-    console.log(
-      "Process command triggered - Testing worksheet being processed..."
-    );
-  } else if (
+  if (
     context.activity.type === "message" &&
     context.activity.value?.action === "selectFile"
   ) {
-    const selectedFile = context.activity.value.fileChoice;
-    await context.sendActivity(`You selected: ${selectedFile}`);
-    console.log(`File selected: ${selectedFile}`);
-  } else if (userMessage === "/files") {
+    const selectedFileData = JSON.parse(context.activity.value.fileChoice);
+    await context.sendActivity(`You selected: ${selectedFileData.name}`);
+    console.log(
+      `File selected - Name: ${selectedFileData.name}, ID: ${selectedFileData.id}`
+    );
+  } else if (userMessage === "/process") {
+    const files = await getFileNamesAndIds(process.env.ONEDRIVE_ID);
+
     const card = {
       type: "AdaptiveCard",
       body: [
         {
           type: "TextBlock",
-          text: "Please select a file:",
+          text: "Process Testing Worksheet",
+        },
+        {
+          type: "TextBlock",
+          text: "Please select the client workbook you would like to process:",
         },
         {
           type: "Input.ChoiceSet",
           id: "fileChoice",
           style: "compact",
-          choices: [
-            { title: "File 1", value: "file1.txt" },
-            { title: "File 2", value: "file2.txt" },
-            { title: "File 3", value: "file3.txt" },
-          ],
+          choices: files.map((file) => ({
+            title: file.name,
+            value: JSON.stringify({ name: file.name, id: file.id }),
+          })),
         },
       ],
       actions: [
@@ -79,9 +79,9 @@ async function handleMessage(context) {
       ],
     });
   } else if (context.activity.value?.action === "createRFI") {
-    const clientName = context.activity.value.clientName;
+    const clientWorkbookId = context.activity.value.clientWorkbookId;
     await context.sendActivity(
-      `Starting RFI spreadsheet creation for ${clientName}...`
+      `Starting RFI spreadsheet creation for ${clientWorkbookId}...`
     );
 
     // Store the conversation reference for later use
