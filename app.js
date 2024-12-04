@@ -10,7 +10,7 @@ import {
   createUpdatedCard,
   createFileSelectionCard,
 } from "./lib/adaptiveCards.js";
-import { handleMessage } from "./lib/handlers.js";
+import { handleMessage } from "./lib/handlers/handleMessage.js";
 dotenv.config();
 
 const app = express();
