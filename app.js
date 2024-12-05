@@ -1,6 +1,6 @@
 import express from "express";
 import { BotFrameworkAdapter, TurnContext } from "botbuilder";
-import dotenv from "dotenv";
+
 import { getFileNamesAndIds } from "./lib/oneDrive.js";
 import { createBotAdapter } from "./lib/createBotAdapter.js";
 import { getGraphClient } from "./lib/msAuth.js";
@@ -11,7 +11,11 @@ import {
   createFileSelectionCard,
 } from "./lib/adaptiveCards.js";
 import { handleMessage } from "./lib/handlers/handleMessage.js";
-dotenv.config();
+import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
+
+loadEnvironmentVariables();
+
+console.log("App is running--->", process.env.ROOT_DIRECTORY_NAME);
 
 const app = express();
 app.use(express.json());
