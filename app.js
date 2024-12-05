@@ -15,8 +15,6 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 
 loadEnvironmentVariables();
 
-console.log("App is running--->", process.env.ROOT_DIRECTORY_NAME);
-
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3978;
