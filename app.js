@@ -1,24 +1,17 @@
 import express from "express";
-import { BotFrameworkAdapter, TurnContext } from "botbuilder";
-
-import { getFileNamesAndIds } from "./lib/oneDrive.js";
 import { createBotAdapter } from "./lib/createBotAdapter.js";
-import { getGraphClient } from "./lib/msAuth.js";
-import { processTesting } from "./lib/worksheetProcessing.js";
-import { processTestingWorksheet } from "./lib/botProcessing.js";
-import {
-  createUpdatedCard,
-  createFileSelectionCard,
-} from "./lib/adaptiveCards.js";
 import { handleMessage } from "./lib/handlers/handleMessage.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
-
+import { createThumbnailCard } from "./lib/adaptiveCards.js";
+// Load environment variables
 loadEnvironmentVariables();
 
+// Create the express app, JSON middleware and port
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3978;
 
+// Create the bot adapter
 const adapter = await createBotAdapter();
 
 app.get("/", (req, res) => {
@@ -32,28 +25,8 @@ app.post("/api/showCard", async (req, res) => {
   const { clientName } = req.body; // Added clientName parameter
   showThumbnailCard = true; // Set the boolean to true
 
-  const thumbnailCard = {
-    type: "ThumbnailCard",
-    title: `Testing Worksheet Completed for ${clientName}`,
-    text: `The Testing Worksheet for ${clientName} has been completed. it is ready to be processed.`,
-    images: [
-      {
-        url: "https://example.com/thumbnail.png",
-      },
-    ],
-    buttons: [
-      {
-        type: "messageBack",
-        title: "Create RFI Spreadsheet",
-        text: "Processing RFI Spreadsheet...",
-        displayText: "Creating RFI Spreadsheet...",
-        value: {
-          action: "createRFI",
-          clientName: clientName,
-        },
-      },
-    ],
-  };
+  // Create the thumbnail card
+  const thumbnailCard = createThumbnailCard(clientName);
 
   // Send the thumbnail card to a specific user or channel
   const message = {
