@@ -5,6 +5,11 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 import { createThumbnailCard } from "./lib/adaptiveCards.js";
 // Load environment variables
 loadEnvironmentVariables();
+console.log("Environment variables loaded:", {
+  clientId: process.env.CLIENT_ID ? "Present" : "Missing",
+  tenantId: process.env.TENANT_ID ? "Present" : "Missing",
+  clientSecret: process.env.CLIENT_SECRET ? "Present" : "Missing",
+});
 
 // Create the express app, JSON middleware and port
 const app = express();
