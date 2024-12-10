@@ -11,6 +11,8 @@ console.log("Environment variables loaded:", {
   clientSecret: process.env.CLIENT_SECRET ? "Present" : "Missing",
 });
 
+console.log("Root directory name:", process.env.ROOT_DIRECTORY_NAME);
+
 // Create the express app, JSON middleware and port
 const app = express();
 app.use(express.json());
