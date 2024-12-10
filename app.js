@@ -1,6 +1,6 @@
 import express from "express";
 import { createBotAdapter } from "./lib/createBotAdapter.js";
-import { handleMessage } from "./lib/handlers/handleMessage.js";
+import { handleMessages } from "./lib/handlers/handleMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
 import { createThumbnailCard } from "./lib/adaptiveCards.js";
 // Load environment variables
@@ -69,7 +69,7 @@ app.post("/api/showCard", async (req, res) => {
 app.post("/api/messages", (req, res) => {
   adapter.processActivity(req, res, async (context) => {
     if (context.activity.type === "message") {
-      await handleMessage(adapter, context);
+      await handleMessages(adapter, context);
     } else {
       await context.sendActivity(`[${context.activity.type}] event detected`);
     }
