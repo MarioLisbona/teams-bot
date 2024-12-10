@@ -2,6 +2,5 @@ node_modules
 .env.local.onedrive
 .env.production
 .env.local.btrmnt
-ELS-TEAMS-BOT-TEST
 *manifest*/
 
