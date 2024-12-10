@@ -5,6 +5,13 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 import { createThumbnailCard } from "./lib/adaptiveCards.js";
 // Load environment variables
 loadEnvironmentVariables();
+console.log("Environment variables loaded:", {
+  clientId: process.env.CLIENT_ID ? "Present" : "Missing",
+  tenantId: process.env.TENANT_ID ? "Present" : "Missing",
+  clientSecret: process.env.CLIENT_SECRET ? "Present" : "Missing",
+});
+
+console.log("Root directory name:", process.env.ROOT_DIRECTORY_NAME);
 
 // Create the express app, JSON middleware and port
 const app = express();
@@ -38,7 +45,6 @@ app.post("/api/showCard", async (req, res) => {
     ],
   };
 
-  // Replace 'YOUR_USER_ID' with the actual user ID or context as needed
   const userId =
     "29:1xG3Q1I-CSlqfIN-rd3oJTcketwzGgjE75Hppzj3B852n2t16FgmTSK-aWI7tgt0oAhpIB101UU_5wU-njL2Lzg"; // Replace with the actual user ID
   const conversationReference = {

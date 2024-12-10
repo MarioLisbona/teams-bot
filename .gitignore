@@ -4,3 +4,5 @@ node_modules
 .env.local.btrmnt
 ELS-TEAMS-BOT-TEST
 manifest/
+manifest-new/
+
