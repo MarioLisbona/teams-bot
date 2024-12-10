@@ -45,7 +45,6 @@ app.post("/api/showCard", async (req, res) => {
     ],
   };
 
-  // Replace 'YOUR_USER_ID' with the actual user ID or context as needed
   const userId =
     "29:1xG3Q1I-CSlqfIN-rd3oJTcketwzGgjE75Hppzj3B852n2t16FgmTSK-aWI7tgt0oAhpIB101UU_5wU-njL2Lzg"; // Replace with the actual user ID
   const conversationReference = {
