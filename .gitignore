@@ -3,6 +3,5 @@ node_modules
 .env.production
 .env.local.btrmnt
 ELS-TEAMS-BOT-TEST
-manifest/
-manifest-new/
+*manifest*/
 
