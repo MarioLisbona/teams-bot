@@ -2,7 +2,6 @@ import express from "express";
 import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
 import { handleMessages } from "./lib/handlers/handleMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
-import { createThumbnailCard } from "./lib/utils/adaptiveCards.js";
 // Load environment variables
 loadEnvironmentVariables();
 
