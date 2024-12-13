@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon app.js",
+    "test": "cross-env NODE_ENV=development node lib/utils/openAi.js",
     "start": "cross-env NODE_ENV=production node app.js"
   },
   "keywords": [],
