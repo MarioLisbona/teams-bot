@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 app.post("/api/messages", (req, res) => {
   adapter.processActivity(req, res, async (context) => {
     if (context.activity.type === "message") {
-      await handleMessages(adapter, context);
+      await handleMessages(context);
     } else {
       await handleTeamsActivity(context);
     }
