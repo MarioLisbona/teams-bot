@@ -2,6 +2,7 @@ import express from "express";
 import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
 import { handleMessages } from "./lib/handlers/handleMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
+import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 // Load environment variables
 loadEnvironmentVariables();
 
@@ -22,9 +23,9 @@ app.get("/", (req, res) => {
 app.post("/api/messages", (req, res) => {
   adapter.processActivity(req, res, async (context) => {
     if (context.activity.type === "message") {
-      await handleMessages(adapter, context);
+      await handleMessages(context);
     } else {
-      await context.sendActivity(`[${context.activity.type}] event detected`);
+      await handleTeamsActivity(context);
     }
   });
 });
