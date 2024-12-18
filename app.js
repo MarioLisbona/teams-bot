@@ -2,6 +2,7 @@ import express from "express";
 import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
 import { handleMessages } from "./lib/handlers/handleMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
+import { handleTeamsActivity } from "./lib/utils/errorHandling.js";
 // Load environment variables
 loadEnvironmentVariables();
 
@@ -16,6 +17,11 @@ const adapter = await createBotAdapter();
 // Add error handling to adapter
 adapter.onTurnError = async (context, error) => {
   console.error(`\n [onTurnError] unhandled error: ${error}`);
+  console.error("Error details:", {
+    activityType: context.activity.type,
+    error: error.stack,
+    activity: context.activity,
+  });
 
   // Don't attempt to send messages if the conversation is gone
   if (
@@ -24,6 +30,15 @@ adapter.onTurnError = async (context, error) => {
     error.message?.includes("bot is not part of the conversation roster")
   ) {
     console.log("Conversation no longer exists, skipping error message");
+    return;
+  }
+
+  // For messageDelete and messageUpdate, we don't want to send error messages
+  if (
+    context.activity.type === "messageDelete" ||
+    context.activity.type === "messageUpdate"
+  ) {
+    console.log(`Skipping error message for ${context.activity.type} activity`);
     return;
   }
 
@@ -45,7 +60,7 @@ app.post("/api/messages", (req, res) => {
     if (context.activity.type === "message") {
       await handleMessages(adapter, context);
     } else {
-      await context.sendActivity(`[${context.activity.type}] event detected`);
+      await handleTeamsActivity(context);
     }
   });
 });
