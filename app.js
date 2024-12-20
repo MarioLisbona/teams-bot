@@ -3,6 +3,7 @@ import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
 import { handleMessages } from "./lib/handlers/handleMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
+import { createProcessingResultsCard } from "./lib/utils/adaptiveCards.js";
 // Load environment variables
 loadEnvironmentVariables();
 
@@ -38,71 +39,6 @@ app.post("/api/test-teams-message", async (req, res) => {
     const message = req.body.message || "Processing results";
     const images = req.body.images || [];
 
-    // Create an Adaptive Card with larger dimensions
-    const card = {
-      type: "AdaptiveCard",
-      version: "1.4",
-      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
-      fallbackText: "Your client doesn't support Adaptive Cards.",
-      speak: message,
-      width: "full",
-      body: [
-        {
-          type: "Container",
-          width: "stretch",
-          // minHeight: "100px",
-          items: [
-            {
-              type: "TextBlock",
-              text: message,
-              size: "Large",
-              weight: "Bolder",
-              wrap: true,
-            },
-          ],
-        },
-        // Split images into groups of 3 and create multiple ColumnSets
-        ...chunk(images, 3).map((imageGroup) => ({
-          type: "ColumnSet",
-          width: "stretch",
-          spacing: "Large",
-          columns: imageGroup.map((url) => ({
-            type: "Column",
-            width: "stretch",
-            items: [
-              {
-                type: "Image",
-                url: url,
-                size: "Large",
-                spacing: "None",
-                horizontalAlignment: "Center",
-              },
-            ],
-          })),
-        })),
-      ],
-      actions: [
-        {
-          type: "Action.Submit",
-          title: "✅ Approve",
-          data: {
-            action: "approve_processing",
-            value: "yes",
-          },
-          style: "positive",
-        },
-        {
-          type: "Action.Submit",
-          title: "❌ Reject",
-          data: {
-            action: "approve_processing",
-            value: "no",
-          },
-          style: "destructive",
-        },
-      ],
-    };
-
     // Helper function to split array into chunks
     function chunk(array, size) {
       const chunked = [];
@@ -111,6 +47,12 @@ app.post("/api/test-teams-message", async (req, res) => {
       }
       return chunked;
     }
+
+    const processingResultsCard = createProcessingResultsCard(
+      message,
+      images,
+      chunk
+    );
 
     // Create a reference to the conversation
     const conversationReference = {
@@ -130,7 +72,7 @@ app.post("/api/test-teams-message", async (req, res) => {
             attachments: [
               {
                 contentType: "application/vnd.microsoft.card.adaptive",
-                content: card,
+                content: processingResultsCard,
               },
             ],
           });
