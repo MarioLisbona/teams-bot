@@ -30,6 +30,40 @@ app.post("/api/messages", (req, res) => {
   });
 });
 
+// Test route for sending messages to Teams
+app.post("/api/test-teams-message", async (req, res) => {
+  try {
+    const { serviceUrl, conversationId, channelId, tenantId } =
+      req.body.messageDetails;
+    const message =
+      req.body.message ||
+      "This is a test message from the /api/test-teams-message endpoint!";
+
+    // Create a reference to the conversation
+    const conversationReference = {
+      channelId: channelId,
+      serviceUrl: serviceUrl,
+      conversation: { id: conversationId },
+      tenantId: tenantId,
+    };
+
+    // Add a delay of 3 seconds before sending the message
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Use the adapter to continue the conversation and send a message
+    await adapter.continueConversation(
+      conversationReference,
+      async (turnContext) => {
+        await turnContext.sendActivity(message);
+      }
+    );
+
+    res.status(200).json({ message: "Message sent successfully" });
+  } catch (error) {
+    console.error("Error sending test message:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(
