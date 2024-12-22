@@ -40,6 +40,8 @@ app.post("/api/validate-images", async (req, res) => {
     const message = req.body.message || "Please review these images";
     const images = req.body.images || [];
 
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await handleValidateImages(
       adapter,
       message,
