@@ -7,6 +7,8 @@ import {
   createProcessingResultsCard,
   createWorkflow1ValidationCard,
 } from "./lib/utils/adaptiveCards.js";
+import { handleValidateImages } from "./lib/handlers/handleValidateImages.js";
+
 // Load environment variables
 loadEnvironmentVariables();
 
@@ -42,85 +44,14 @@ app.post("/api/validate-images", async (req, res) => {
     const message = req.body.message || "Please review these images";
     const images = req.body.images || [];
 
-    // Helper function to split array into chunks
-    function chunk(array, size) {
-      const chunked = [];
-      for (let i = 0; i < array.length; i += size) {
-        chunked.push(array.slice(i, i + size));
-      }
-      return chunked;
-    }
-
-    // Create initial card with images and approve/reject buttons
-    const reviewCard = {
-      type: "AdaptiveCard",
-      version: "1.0",
-      body: [
-        {
-          type: "TextBlock",
-          text: message,
-          size: "medium",
-          weight: "bolder",
-        },
-        ...chunk(images, 3).map((imageChunk) => ({
-          type: "ColumnSet",
-          columns: imageChunk.map((url) => ({
-            type: "Column",
-            width: "stretch",
-            items: [
-              {
-                type: "Image",
-                url: url,
-                size: "stretch",
-                height: "200px",
-              },
-            ],
-          })),
-        })),
-      ],
-      actions: [
-        {
-          type: "Action.Submit",
-          title: "✅ Approve",
-          style: "positive",
-          data: {
-            action: "approve",
-            images: images,
-          },
-        },
-        {
-          type: "Action.Submit",
-          title: "❌ Reject",
-          style: "destructive",
-          data: {
-            action: "reject",
-            images: images,
-          },
-        },
-      ],
-    };
-
-    // Create a reference to the conversation
-    const conversationReference = {
-      channelId: channelId,
-      serviceUrl: serviceUrl,
-      conversation: { id: conversationId },
-      tenantId: tenantId,
-    };
-
-    // Use the adapter to continue the conversation and send the card
-    await adapter.continueConversation(
-      conversationReference,
-      async (turnContext) => {
-        await turnContext.sendActivity({
-          attachments: [
-            {
-              contentType: "application/vnd.microsoft.card.adaptive",
-              content: reviewCard,
-            },
-          ],
-        });
-      }
+    await handleValidateImages(
+      adapter,
+      message,
+      serviceUrl,
+      conversationId,
+      channelId,
+      tenantId,
+      images
     );
 
     res.status(200).json({ message: "Message sent successfully" });
