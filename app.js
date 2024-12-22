@@ -73,6 +73,7 @@ app.post("/api/validation", async (req, res) => {
       coc: false,
       gtp: false,
     };
+    const jobId = req.body.jobId;
 
     await handleValidateWorkflow(
       adapter,
@@ -80,7 +81,8 @@ app.post("/api/validation", async (req, res) => {
       conversationId,
       channelId,
       tenantId,
-      validations
+      validations,
+      jobId
     );
 
     res.status(200).json({ message: "Validation card sent successfully" });
