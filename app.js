@@ -3,10 +3,6 @@ import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
 import { handleMessages } from "./lib/handlers/handleMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
-import {
-  createProcessingResultsCard,
-  createWorkflow1ValidationCard,
-} from "./lib/utils/adaptiveCards.js";
 import { handleValidateImages } from "./lib/handlers/handleValidateImages.js";
 import { handleValidateWorkflow } from "./lib/handlers/handleValidateWorkflow.js";
 // Load environment variables
