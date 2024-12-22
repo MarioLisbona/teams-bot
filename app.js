@@ -39,7 +39,7 @@ app.post("/api/test-teams-message", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
-    const message = req.body.message || "Processing results";
+    const message = req.body.message || "Please review these images";
     const images = req.body.images || [];
 
     // Helper function to split array into chunks
@@ -51,11 +51,54 @@ app.post("/api/test-teams-message", async (req, res) => {
       return chunked;
     }
 
-    const processingResultsCard = createProcessingResultsCard(
-      message,
-      images,
-      chunk
-    );
+    // Create initial card with images and approve/reject buttons
+    const reviewCard = {
+      type: "AdaptiveCard",
+      version: "1.0",
+      body: [
+        {
+          type: "TextBlock",
+          text: message,
+          size: "medium",
+          weight: "bolder",
+        },
+        ...chunk(images, 3).map((imageChunk) => ({
+          type: "ColumnSet",
+          columns: imageChunk.map((url) => ({
+            type: "Column",
+            width: "stretch",
+            items: [
+              {
+                type: "Image",
+                url: url,
+                size: "stretch",
+                height: "200px",
+              },
+            ],
+          })),
+        })),
+      ],
+      actions: [
+        {
+          type: "Action.Submit",
+          title: "✅ Approve",
+          style: "positive",
+          data: {
+            action: "approve",
+            images: images,
+          },
+        },
+        {
+          type: "Action.Submit",
+          title: "❌ Reject",
+          style: "destructive",
+          data: {
+            action: "reject",
+            images: images,
+          },
+        },
+      ],
+    };
 
     // Create a reference to the conversation
     const conversationReference = {
@@ -69,20 +112,14 @@ app.post("/api/test-teams-message", async (req, res) => {
     await adapter.continueConversation(
       conversationReference,
       async (turnContext) => {
-        if (images.length > 0) {
-          // Send as an Adaptive Card
-          await turnContext.sendActivity({
-            attachments: [
-              {
-                contentType: "application/vnd.microsoft.card.adaptive",
-                content: processingResultsCard,
-              },
-            ],
-          });
-        } else {
-          // Send as a simple message if no images
-          await turnContext.sendActivity(message);
-        }
+        await turnContext.sendActivity({
+          attachments: [
+            {
+              contentType: "application/vnd.microsoft.card.adaptive",
+              content: reviewCard,
+            },
+          ],
+        });
       }
     );
 
