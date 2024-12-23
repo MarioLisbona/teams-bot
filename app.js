@@ -1,6 +1,6 @@
 import express from "express";
 import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
-import { handleMessages } from "./lib/handlers/handleMessages.js";
+import { handleMessages } from "./lib/handlers/handleTeamsMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import { handleValidateImages } from "./lib/handlers/handleValidateImages.js";
