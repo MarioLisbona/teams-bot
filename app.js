@@ -101,7 +101,7 @@ app.post("/api/workflow-progress", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
-    const progress = req.body.progress || {};
+    const isCompleted = req.body.isCompleted || false;
     const workflowStep = req.body.workflowStep || {};
     const jobId = req.body.jobId;
 
@@ -111,7 +111,7 @@ app.post("/api/workflow-progress", async (req, res) => {
       conversationId,
       channelId,
       tenantId,
-      progress,
+      isCompleted,
       workflowStep,
       jobId
     );
