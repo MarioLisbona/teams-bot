@@ -4,7 +4,7 @@ import { handleMessages } from "./lib/handlers/handleTeamsMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import {
-  handleValidateImages,
+  handleValidateSignatures,
   handleValidateWorkflow,
   handleWorkflowProgress,
 } from "./lib/handlers/handleAgentWorkFlow.js";
@@ -37,7 +37,7 @@ app.post("/api/messages", (req, res) => {
 });
 
 // Test route for sending messages to Teams
-app.post("/api/validate-images", async (req, res) => {
+app.post("/api/validate-signatures", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
@@ -46,7 +46,7 @@ app.post("/api/validate-images", async (req, res) => {
 
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    await handleValidateImages(
+    await handleValidateSignatures(
       adapter,
       message,
       serviceUrl,
