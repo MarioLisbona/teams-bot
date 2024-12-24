@@ -63,8 +63,35 @@ app.post("/api/validate/signatures", async (req, res) => {
   }
 });
 
+// Workflow progress route
+app.post("/api/workflow/progress", async (req, res) => {
+  try {
+    const { serviceUrl, conversationId, channelId, tenantId } =
+      req.body.messageDetails;
+    const isComplete = req.body.isComplete || false;
+    const workflowStep = req.body.workflowStep || {};
+    const jobId = req.body.jobId;
+
+    await handleWorkflowProgress(
+      adapter,
+      serviceUrl,
+      conversationId,
+      channelId,
+      tenantId,
+      isComplete,
+      workflowStep,
+      jobId
+    );
+
+    res.status(200).json({ message: "Workflow progress updated successfully" });
+  } catch (error) {
+    console.error("Error updating workflow progress:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Test route for validation card
-app.post("/api/validation", async (req, res) => {
+app.post("/api/workflow/complete", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
@@ -92,33 +119,6 @@ app.post("/api/validation", async (req, res) => {
     res.status(200).json({ message: "Validation card sent successfully" });
   } catch (error) {
     console.error("Error sending validation card:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Workflow progress route
-app.post("/api/workflow/progress", async (req, res) => {
-  try {
-    const { serviceUrl, conversationId, channelId, tenantId } =
-      req.body.messageDetails;
-    const isCompleted = req.body.isCompleted || false;
-    const workflowStep = req.body.workflowStep || {};
-    const jobId = req.body.jobId;
-
-    await handleWorkflowProgress(
-      adapter,
-      serviceUrl,
-      conversationId,
-      channelId,
-      tenantId,
-      isCompleted,
-      workflowStep,
-      jobId
-    );
-
-    res.status(200).json({ message: "Workflow progress updated successfully" });
-  } catch (error) {
-    console.error("Error updating workflow progress:", error);
     res.status(500).json({ error: error.message });
   }
 });
