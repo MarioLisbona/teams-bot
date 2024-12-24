@@ -97,7 +97,7 @@ app.post("/api/validation", async (req, res) => {
 });
 
 // Workflow progress route
-app.post("/api/workflow-progress", async (req, res) => {
+app.post("/api/workflow/progress", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
