@@ -37,7 +37,7 @@ app.post("/api/messages", (req, res) => {
 });
 
 // Test route for sending messages to Teams
-app.post("/api/validate-signatures", async (req, res) => {
+app.post("/api/validate/signatures", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
