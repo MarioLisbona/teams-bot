@@ -5,7 +5,7 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import {
   handleValidateSignatures,
-  handleValidateWorkflow,
+  handleHumanValidation,
   handleWorkflowProgress,
 } from "./lib/handlers/handleAgentWorkFlow.js";
 
@@ -90,8 +90,8 @@ app.post("/api/workflow/progress", async (req, res) => {
   }
 });
 
-// Test route for validation card
-app.post("/api/workflow/complete", async (req, res) => {
+// Agent has completed the workflow - User is now prompted to validate required documents
+app.post("/api/workflow/validate", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
@@ -106,7 +106,7 @@ app.post("/api/workflow/complete", async (req, res) => {
     };
     const jobId = req.body.jobId;
 
-    await handleValidateWorkflow(
+    await handleHumanValidation(
       adapter,
       serviceUrl,
       conversationId,
