@@ -6,7 +6,7 @@ import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import {
   validateSignatures,
   updateWorkflowProgress,
-  handleHumanWorkflowValidationUI,
+  humanValidationSteps,
 } from "./lib/handlers/handleAgentWorkFlow.js";
 
 // Load environment variables
@@ -91,7 +91,7 @@ app.post("/api/workflow/update", async (req, res) => {
 });
 
 // Workflow validation route
-app.post("/api/workflow/validate", async (req, res) => {
+app.post("/api/workflow/validate/human", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
@@ -99,7 +99,7 @@ app.post("/api/workflow/validate", async (req, res) => {
 
     const jobId = req.body.jobId;
 
-    await handleHumanWorkflowValidationUI(
+    await humanValidationSteps(
       adapter,
       serviceUrl,
       conversationId,
