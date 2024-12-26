@@ -95,17 +95,10 @@ app.post("/api/workflow/validate", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
-    const validationsRequired = req.body.validationsRequired || {
-      3.4: true,
-      3.5: true,
-      3.7: true,
-      7.6: true,
-      7.7: true,
-      7.9: true,
-      8.6: true,
-      8.7: true,
-    };
+    const validationsRequired = req.body.validationsRequired || {};
+
     const jobId = req.body.jobId;
+    console.log("route hit", jobId);
 
     await handleHumanWorkflowValidationUI(
       adapter,
