@@ -5,7 +5,7 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import {
   validateSignatures,
-  updateWorkflowProgress,
+  handleWorkflowProgress,
   handleHumanWorkflowValidationUI,
 } from "./lib/handlers/handleAgentWorkFlow.js";
 
@@ -64,7 +64,7 @@ app.post("/api/workflow/validate/signatures", async (req, res) => {
 });
 
 // Workflow progress route
-app.post("/api/workflow/update", async (req, res) => {
+app.post("/api/workflow/progress", async (req, res) => {
   try {
     const { serviceUrl, conversationId, channelId, tenantId } =
       req.body.messageDetails;
@@ -72,7 +72,7 @@ app.post("/api/workflow/update", async (req, res) => {
     const workflowStep = req.body.workflowStep || {};
     const jobId = req.body.jobId;
 
-    await updateWorkflowProgress(
+    await handleWorkflowProgress(
       adapter,
       serviceUrl,
       conversationId,
