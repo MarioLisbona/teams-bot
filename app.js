@@ -7,7 +7,7 @@ import {
   handleValidateSignatures,
   handleValidateWorkflow,
   handleWorkflowProgress,
-  handleHumanWorkflowValidation,
+  handleHumanWorkflowValidationUI,
 } from "./lib/handlers/handleAgentWorkFlow.js";
 
 // Load environment variables
@@ -108,7 +108,7 @@ app.post("/api/workflow/validate", async (req, res) => {
     };
     const jobId = req.body.jobId;
 
-    await handleHumanWorkflowValidation(
+    await handleHumanWorkflowValidationUI(
       adapter,
       serviceUrl,
       conversationId,
