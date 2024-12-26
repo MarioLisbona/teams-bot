@@ -5,7 +5,6 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import {
   handleValidateSignatures,
-  handleValidateWorkflow,
   handleWorkflowProgress,
   handleHumanWorkflowValidationUI,
 } from "./lib/handlers/handleAgentWorkFlow.js";
@@ -127,39 +126,6 @@ app.post("/api/workflow/validate", async (req, res) => {
     });
   } catch (error) {
     console.error("Error processing validation request:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Test route for validation card
-app.post("/api/workflow/complete", async (req, res) => {
-  try {
-    const { serviceUrl, conversationId, channelId, tenantId } =
-      req.body.messageDetails;
-    const validations = req.body.validations || {
-      nomForm: false,
-      siteAssessment: false,
-      taxInvoice: false,
-      ccew: false,
-      installerDec: false,
-      coc: false,
-      gtp: false,
-    };
-    const jobId = req.body.jobId;
-
-    await handleValidateWorkflow(
-      adapter,
-      serviceUrl,
-      conversationId,
-      channelId,
-      tenantId,
-      validations,
-      jobId
-    );
-
-    res.status(200).json({ message: "Validation card sent successfully" });
-  } catch (error) {
-    console.error("Error sending validation card:", error);
     res.status(500).json({ error: error.message });
   }
 });
