@@ -5,6 +5,7 @@ import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js"
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import validateRoutes from "./lib/routes/validateRoutes.js";
 import updateRoutes from "./lib/routes/updateRoutes.js";
+import messageRoutes from "./lib/routes/messageRoutes.js";
 
 // Load environment variables
 loadEnvironmentVariables();
@@ -35,19 +36,9 @@ app.get("/", (req, res) => {
 });
 
 // Use the routes
+app.use("/api", messageRoutes);
 app.use("/api/workflow", validateRoutes);
 app.use("/api/workflow", updateRoutes);
-
-// Webhook endpoint for bot messages
-app.post("/api/messages", (req, res) => {
-  adapter.processActivity(req, res, async (context) => {
-    if (context.activity.type === "message") {
-      await handleMessages(context);
-    } else {
-      await handleTeamsActivity(context);
-    }
-  });
-});
 
 // Start the server
 app.listen(port, () => {
