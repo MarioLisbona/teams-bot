@@ -98,7 +98,6 @@ app.post("/api/workflow/validate", async (req, res) => {
     const validationsRequired = req.body.validationsRequired || {};
 
     const jobId = req.body.jobId;
-    console.log("route hit", jobId);
 
     await handleHumanWorkflowValidationUI(
       adapter,
