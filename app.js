@@ -7,6 +7,7 @@ import {
   handleValidateSignatures,
   handleValidateWorkflow,
   handleWorkflowProgress,
+  handleHumanWorkflowValidation,
 } from "./lib/handlers/handleAgentWorkFlow.js";
 
 // Load environment variables
@@ -86,6 +87,46 @@ app.post("/api/workflow/progress", async (req, res) => {
     res.status(200).json({ message: "Workflow progress updated successfully" });
   } catch (error) {
     console.error("Error updating workflow progress:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Workflow validation route
+app.post("/api/workflow/validate", async (req, res) => {
+  try {
+    const { serviceUrl, conversationId, channelId, tenantId } =
+      req.body.messageDetails;
+    const validationsRequired = req.body.validationsRequired || {
+      3.4: true,
+      3.5: true,
+      3.7: true,
+      7.6: true,
+      7.7: true,
+      7.9: true,
+      8.6: true,
+      8.7: true,
+    };
+    const jobId = req.body.jobId;
+
+    await handleHumanWorkflowValidation(
+      adapter,
+      serviceUrl,
+      conversationId,
+      channelId,
+      tenantId,
+      validationsRequired,
+      jobId
+    );
+
+    // TODO: Add your validation handling logic here
+    // For now, just return success
+    res.status(200).json({
+      message: "Validation request received successfully",
+      jobId,
+      validationsRequired,
+    });
+  } catch (error) {
+    console.error("Error processing validation request:", error);
     res.status(500).json({ error: error.message });
   }
 });
