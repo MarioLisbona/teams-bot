@@ -4,7 +4,7 @@ import { handleMessages } from "./lib/handlers/handleTeamsMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
 import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
 import validateRoutes from "./lib/routes/validateRoutes.js";
-import updateRoutes from "./lib/routes/updateRoutes.js";
+import notificationRoutes from "./lib/routes/notificationRoutes.js";
 import messageRoutes from "./lib/routes/messageRoutes.js";
 
 // Load environment variables
@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
 // Use the routes
 app.use("/api", messageRoutes);
 app.use("/api/workflow", validateRoutes);
-app.use("/api/workflow", updateRoutes);
+app.use("/api/workflow", notificationRoutes);
 
 // Start the server
 app.listen(port, () => {
