@@ -1,11 +1,6 @@
 import express from "express";
 import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
-import { handleMessages } from "./lib/handlers/handleTeamsMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
-import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
-import validateRoutes from "./lib/routes/validateRoutes.js";
-import notificationRoutes from "./lib/routes/notificationRoutes.js";
-import messageRoutes from "./lib/routes/messageRoutes.js";
 import createMessageRoutes from "./lib/routes/messageRoutes.js";
 import createValidateRoutes from "./lib/routes/validateRoutes.js";
 import createNotificationRoutes from "./lib/routes/notificationRoutes.js";
