@@ -1,11 +1,9 @@
 import express from "express";
 import { createBotAdapter } from "./lib/utils/createBotAdapter.js";
-import { handleMessages } from "./lib/handlers/handleTeamsMessages.js";
 import { loadEnvironmentVariables } from "./lib/environment/setupEnvironment.js";
-import { handleTeamsActivity } from "./lib/utils/teamsActivity.js";
-import validateRoutes from "./lib/routes/validateRoutes.js";
-import updateRoutes from "./lib/routes/updateRoutes.js";
-import messageRoutes from "./lib/routes/messageRoutes.js";
+import createMessageRoutes from "./lib/routes/messageRoutes.js";
+import createValidateRoutes from "./lib/routes/validateRoutes.js";
+import createNotificationRoutes from "./lib/routes/notificationRoutes.js";
 
 // Load environment variables
 loadEnvironmentVariables();
@@ -18,27 +16,15 @@ const port = process.env.PORT || 3978;
 // Create the bot adapter
 const adapter = await createBotAdapter();
 
-// Middleware to inject the adapter
-app.use("/api", (req, res, next) => {
-  req.adapter = adapter;
-  next();
-});
-
-// Middleware to inject the adapter for workflow routes
-app.use("/api/workflow", (req, res, next) => {
-  req.adapter = adapter;
-  next();
-});
-
 // Home route
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
 // Use the routes
-app.use("/api", messageRoutes);
-app.use("/api/workflow", validateRoutes);
-app.use("/api/workflow", updateRoutes);
+app.use("/api", createMessageRoutes(adapter));
+app.use("/api", createValidateRoutes(adapter));
+app.use("/api", createNotificationRoutes(adapter));
 
 // Start the server
 app.listen(port, () => {
