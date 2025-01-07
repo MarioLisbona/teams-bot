@@ -5,7 +5,7 @@ ENV=${1:-development}
 
 if [ "$ENV" = "production" ]; then
     echo "Starting production environment..."
-    docker-compose up -d
+    docker-compose -f docker-compose.yml up -d
 elif [ "$ENV" = "development" ]; then
     echo "Starting development environment..."
     docker-compose -f docker-compose.dev.yml up -d
