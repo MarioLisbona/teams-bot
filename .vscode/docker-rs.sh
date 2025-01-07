@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Get the container ID
-CONTAINER_ID=$(docker ps | grep teams-bot | head -n 1 | cut -d' ' -f1)
+# Get the container ID for dev environment specifically
+CONTAINER_ID=$(docker ps | grep teams-bot-dev | head -n 1 | cut -d' ' -f1)
 
 if [ -z "$CONTAINER_ID" ]; then
-    echo "Container not found!"
+    echo "Development container not found!"
     exit 1
 fi
 
