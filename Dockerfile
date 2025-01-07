@@ -16,6 +16,7 @@ COPY . .
 FROM base as development
 ENV NODE_ENV=development
 EXPOSE 3978
+
 # Use global nodemon
 CMD ["nodemon", "--inspect=0.0.0.0:9229", "app.js"]
 
