@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  teams-bot:
+  teams-bot-dev:
     build:
       context: .
       target: development
