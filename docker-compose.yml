@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  teams-bot:
+    build:
+      context: .
+      target: production
+    ports:
+      - "3978:3978"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./.env.production:/usr/src/app/.env.production:ro
+    restart: unless-stopped
