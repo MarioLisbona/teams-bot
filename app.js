@@ -5,30 +5,52 @@ import createMessageRoutes from "./lib/routes/messageRoutes.js";
 import createValidateRoutes from "./lib/routes/validateRoutes.js";
 import createNotificationRoutes from "./lib/routes/notificationRoutes.js";
 
-// Load environment variables
-loadEnvironmentVariables();
-
-// Create the express app, JSON middleware and port
-const app = express();
-app.use(express.json());
-const port = process.env.PORT || 3978;
-
-// Create the bot adapter
-const adapter = await createBotAdapter();
-
-// Home route
-app.get("/", (req, res) => {
-  res.send("Server is running");
+// Global error handling for uncaught exceptions and unhandled rejections
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  console.error("Stack:", error.stack);
 });
 
-// Use the routes
-app.use("/api", createMessageRoutes(adapter));
-app.use("/api", createValidateRoutes(adapter));
-app.use("/api", createNotificationRoutes(adapter));
-
-// Start the server
-app.listen(port, () => {
-  console.log(
-    `\nBot is running on http://localhost:${port}/api/messages\nServer is running on http://localhost:${port}/`
-  );
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise);
+  console.error("Reason:", reason);
 });
+
+console.log("Starting application...");
+console.log("Environment:", process.env.NODE_ENV);
+console.log("Current working directory:", process.cwd());
+
+try {
+  // Load environment variables
+  loadEnvironmentVariables();
+  console.log("Environment variables loaded successfully");
+
+  // Create the express app, JSON middleware and port
+  const app = express();
+  app.use(express.json());
+  const port = process.env.PORT || 3978;
+
+  // Create the bot adapter
+  const adapter = await createBotAdapter();
+
+  // Home route
+  app.get("/", (req, res) => {
+    res.send("Server is running");
+  });
+
+  // Use the routes
+  app.use("/api", createMessageRoutes(adapter));
+  app.use("/api", createValidateRoutes(adapter));
+  app.use("/api", createNotificationRoutes(adapter));
+
+  // Start the server
+  app.listen(port, () => {
+    console.log(
+      `\nBot is running on http://localhost:${port}/api/messages\nServer is running on http://localhost:${port}/`
+    );
+  });
+} catch (error) {
+  console.error("Startup error:", error);
+  console.error("Stack:", error.stack);
+  process.exit(1);
+}
