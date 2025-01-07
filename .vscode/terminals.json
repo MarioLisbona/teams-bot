@@ -1,0 +1,29 @@
+{
+  "autorun": false,
+  "terminals": [
+    {
+      "name": "Development Server",
+      "description": "Run the development server",
+      "focus": true,
+      "command": "./.vscode/docker-run.sh dev",
+      "icon": "database",
+      "color": "#007acc"
+    },
+    {
+      "name": "Server logs",
+      "description": "Development server logs",
+      "focus": true,
+      "command": "sleep 5 && ./.vscode/docker-logs.sh dev"
+    },
+    {
+      "name": "zsh 1",
+      "description": "Terminal 1",
+      "focus": false
+    },
+    {
+      "name": "zsh 2",
+      "description": "Terminal 2",
+      "focus": false
+    }
+  ]
+}
