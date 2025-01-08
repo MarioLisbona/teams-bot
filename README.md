@@ -6,7 +6,7 @@ This repository contains a Teams Bot application that can be run in both develop
 
 - Docker and Docker Compose installed
 - Node.js 20.x (for local development without Docker)
-- VS Code with Terminals Manager extension installed to use the enhanced development environment
+- VS Code with Terminals Manager extension installed (to use the enhanced development environment)
 
 ## Environment Configuration
 
