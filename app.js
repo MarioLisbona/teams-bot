@@ -29,6 +29,8 @@ try {
   const app = express();
   app.use(express.json());
   const port = process.env.PORT || 3978;
+  const host = process.env.HOST || "localhost";
+  const baseUrl = `http://${host}:${port}`;
 
   // Create the bot adapter
   const adapter = await createBotAdapter();
@@ -45,9 +47,8 @@ try {
 
   // Start the server
   app.listen(port, () => {
-    console.log(
-      `\nBot is running on http://localhost:${port}/api/messages\nServer is running on http://localhost:${port}/`
-    );
+    console.log(`Bot is running on ${baseUrl}/api/messages`);
+    console.log(`Server is running on ${baseUrl}`);
   });
 } catch (error) {
   console.error("Startup error:", error);
