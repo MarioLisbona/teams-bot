@@ -6,14 +6,14 @@
       "description": "Run the development server",
       "focus": true,
       "command": "./.vscode/docker-run.sh dev",
-      "icon": "database",
-      "color": "#007acc"
+      "icon": "server-environment"
     },
     {
       "name": "Server logs",
       "description": "Development server logs",
       "focus": true,
-      "command": "sleep 5 && ./.vscode/docker-logs.sh dev"
+      "command": "sleep 5 && ./.vscode/docker-logs.sh dev",
+      "icon": "output"
     },
     {
       "name": "zsh 1",

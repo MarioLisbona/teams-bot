@@ -8,7 +8,7 @@ services:
     ports:
       - "3978:3978"
     env_file:
-      - .env.local.btrmnt
+      - .env.local
     environment:
       - NODE_ENV=development
     volumes:
