@@ -92,7 +92,7 @@ Open the VS Code Command Palette
 
 - On Windows/Linux: Ctrl + Shift + P
 - On macOS: Cmd + Shift + P
-- `Terminals: Run` to open the terminal manager.
+- `Terminals: Run` to open the terminals for the development environment.
 
 ### Integrated Terminals (`terminals.json`)
 
