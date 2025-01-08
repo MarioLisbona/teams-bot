@@ -1,5 +1,3 @@
-@ -0,0 +1,148 @@
-
 # Teams Bot Application
 
 This repository contains a Teams Bot application that can be run in both development and production environments using Docker containers.
@@ -8,13 +6,13 @@ This repository contains a Teams Bot application that can be run in both develop
 
 - Docker and Docker Compose installed
 - Node.js 20.x (for local development without Docker)
-- VS Code with Terminals Manager extension installed for development
+- VS Code with Terminals Manager extension installed for enhanced development experience
 
 ## Environment Configuration
 
 The application uses different environment files for development and production:
 
-- `.env.local.btrmnt` - Development environment variables
+- `.env.local` - Development environment variables
 - `.env.production` - Production environment variables
 
 ### Environment Variables
@@ -25,7 +23,7 @@ Both environment files contain configuration for:
 - Azure OpenAI configuration
 - SharePoint integration settings
 - Server configuration
-- `.env.sample` contains a description for each environment variable needed for the application to run.
+- `.env.sample` contains a description for each environment variable needed for the application to run
 
 ## Docker Configuration
 
@@ -47,7 +45,7 @@ teams-bot-dev:
 
 - Runs in development mode
 - Mounts source code for hot-reloading
-- Uses .env.local.btrmnt
+- Uses .env.local
 - Exposes port 3978
 
 #### Production (`docker-compose.yml`)
