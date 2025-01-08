@@ -6,7 +6,7 @@ This repository contains a Teams Bot application that can be run in both develop
 
 - Docker and Docker Compose installed
 - Node.js 20.x (for local development without Docker)
-- VS Code with Terminals Manager extension installed (to use the enhanced development environment)
+- VS Code with Terminals Manager extension installed (for enhanced development environment)
 
 ## Environment Configuration
 
@@ -27,7 +27,7 @@ Both environment files contain configuration for:
 - Azure OpenAI configuration
 - Server configuration
 
-`.env.sample` contains a description for each environment variable needed for the application to run
+`.env.sample` contains a description for each environment variable
 
 ## Docker Configuration
 
@@ -61,6 +61,7 @@ teams-bot-prod:
 
 - Runs in production mode
 - Uses .env.production
+- Exposes port 3978
 - Optimized for production deployment
 
 ## Running the Application
@@ -101,13 +102,12 @@ The `.vscode/terminals.json` configures automatic terminal setup:
 
    - Automatically runs the development container
    - Uses `./.vscode/docker-run.sh dev`
-   - Identified by database icon and blue color
 
 2. **Server Logs Terminal**
 
    - Shows real-time container logs
-   - Starts after a 5-second delay to ensure container is running
    - Uses `./.vscode/docker-logs.sh dev`
+   - Starts after a 5-second delay to ensure container is running
 
 3. **Additional Terminals**
    - Two additional zsh terminals for general use
@@ -121,8 +121,6 @@ The `.vscode/terminals.json` configures automatic terminal setup:
 
 #### Logging
 
-- Both environments use JSON file logging
-- Log files are rotated (max 3 files, 10MB each)
 - View logs in real-time using the docker-logs.sh script
 
 ## Scripts Reference
@@ -130,23 +128,24 @@ The `.vscode/terminals.json` configures automatic terminal setup:
 ### `docker-rs.sh`
 
 - Restarts the development container's nodemon process
-- Finds the development container automatically
-- Can trigger reload by touching app.js
 
 ### `docker-run.sh`
 
 - Starts containers based on environment argument
 - Defaults to development if no argument provided
 - Uses appropriate docker-compose file
+- Usage: `./docker-run.sh dev` or `./docker-run.sh prod`
 
 ### `docker-logs.sh`
 
 - Displays container logs in real-time
 - Supports both development and production environments
 - Defaults to development if no argument provided
+- Usage: `./docker-logs.sh dev` or `./docker-logs.sh prod`
 
 ### `docker-down.sh`
 
 - Stops and removes containers
 - Supports both development and production environments
 - Defaults to development if no argument provided
+- Usage: `./docker-down.sh dev` or `./docker-down.sh prod`
