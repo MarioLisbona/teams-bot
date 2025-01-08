@@ -6,7 +6,7 @@ This repository contains a Teams Bot application that can be run in both develop
 
 - Docker and Docker Compose installed
 - Node.js 20.x (for local development without Docker)
-- VS Code with Terminals Manager extension installed for enhanced development experience
+- VS Code with Terminals Manager extension installed to use the enhanced development environment
 
 ## Environment Configuration
 
@@ -19,11 +19,15 @@ The application uses different environment files for development and production:
 
 Both environment files contain configuration for:
 
+- Microsoft Tenant ID
 - Microsoft Teams Bot credentials
-- Azure OpenAI configuration
+- Microsoft Excel Access App credentials
 - SharePoint integration settings
+- Sharepoint Root Directory Name and Template ID
+- Azure OpenAI configuration
 - Server configuration
-- `.env.sample` contains a description for each environment variable needed for the application to run
+
+`.env.sample` contains a description for each environment variable needed for the application to run
 
 ## Docker Configuration
 
