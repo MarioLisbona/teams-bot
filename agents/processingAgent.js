@@ -6,6 +6,7 @@ import {
   processTestingWorksheet,
 } from "./tools/index.js";
 import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
+import { createTeamsUpdate } from "../lib/utils/utils.js";
 
 // Load environment variables first
 loadEnvironmentVariables();
@@ -90,6 +91,13 @@ async function runProcessingAgent(userMessage, context) {
 
 export async function runProcessing(userMessage, context) {
   console.log("Running processing agent");
+  await createTeamsUpdate(
+    context,
+    `Querying the RFI Processing Agent`,
+    userMessage,
+    "🤖",
+    "default"
+  );
   const result = await runProcessingAgent(userMessage, context);
   console.log(result);
 }
