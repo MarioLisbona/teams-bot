@@ -6,7 +6,6 @@ import {
   processTestingWorksheet,
 } from "./tools/index.js";
 import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
-import { createTeamsUpdate } from "../lib/utils/utils.js";
 
 // Load environment variables first
 loadEnvironmentVariables();
@@ -35,7 +34,7 @@ async function createTestingProcessingAgent() {
     [listFolders, listExcelFiles, processTestingWorksheet],
     llm,
     {
-      agentType: "openai-functions", // Changed back to openai-functions
+      agentType: "openai-functions",
       verbose: true,
       maxIterations: 10,
     }
