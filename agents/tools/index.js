@@ -82,13 +82,20 @@ export const processTestingWorksheet = new DynamicStructuredTool({
   }),
   func: async ({ selectedFileData }, runManager) => {
     try {
-      // Create a mock context for Teams messages
-      const context = {
-        sendActivity: async (message) => {
-          // Forward Teams messages to the runManager for agent visibility
-          await runManager?.handleText(message);
-        },
-      };
+      let context = runManager?.context;
+
+      if (!context?.sendActivity) {
+        console.warn(
+          "No valid Teams context available, using fallback messaging"
+        );
+        context = {
+          sendActivity: async (message) => {
+            console.log("Teams Message (fallback):", message);
+            await runManager?.handleText(message);
+            return { id: "fallback-message-id" };
+          },
+        };
+      }
 
       const result = await processRfiWorksheet(context, selectedFileData);
 
@@ -98,6 +105,7 @@ export const processTestingWorksheet = new DynamicStructuredTool({
 
       return `Successfully created new RFI Response workbook: ${result}`;
     } catch (error) {
+      console.error("Processing error:", error);
       return `Error processing RFI worksheet: ${error.message}`;
     }
   },

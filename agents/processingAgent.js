@@ -1,6 +1,10 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
-import { listFolders, listExcelFiles } from "./tools/index.js";
+import {
+  listFolders,
+  listExcelFiles,
+  processTestingWorksheet,
+} from "./tools/index.js";
 import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
 
@@ -28,7 +32,7 @@ const llm = new ChatOpenAI({
 
 async function createTestingProcessingAgent() {
   const executor = await initializeAgentExecutorWithOptions(
-    [listFolders, listExcelFiles],
+    [listFolders, listExcelFiles, processTestingWorksheet],
     llm,
     {
       agentType: "openai-functions", // Changed back to openai-functions
@@ -39,12 +43,12 @@ async function createTestingProcessingAgent() {
   return executor;
 }
 
-async function runProcessingAgent(auditTask) {
+async function runProcessingAgent(userMessage, context) {
   const agent = await createTestingProcessingAgent();
 
   const result = await agent.invoke({
     input: `You are an assistant in a company that audits energy efficiency installations.
-        Complete this task: ${auditTask}.
+        Complete this task: ${userMessage}.
         Follow these steps strictly in order:
         1. Use listFolders and listExcelFiles to find the workbook with the exact filename
         2. Create an object called selectedFileData with the following properties:
@@ -52,8 +56,14 @@ async function runProcessingAgent(auditTask) {
         - directoryId: the id of the directory the file was found in
         - directoryName: the name of the directory the file was found in
         - name: the name of the file
-        3. Return the selectedFileData object as your response in addition to answering the question.
+        3. Use processTestingWorksheet to process the file and generate an RFI Response workbook, 
+        passing in the selectedFileData and context objects as arguments.
         `,
+    context: {
+      sendActivity: context.sendActivity.bind(context),
+      turnState: context.turnState,
+      activity: context.activity,
+    },
   });
   return result;
 }
@@ -61,15 +71,8 @@ async function runProcessingAgent(auditTask) {
 const userMessage =
   "What is the id of the file named 'XXYY - Testing.xlsx'? Can you tell me the ID of the directory the file was found in?";
 
-export async function runProcessing(context, userMessage) {
+export async function runProcessing(userMessage, context) {
   console.log("Running processing agent");
-  const result = await runProcessingAgent(userMessage);
+  const result = await runProcessingAgent(userMessage, context);
   console.log(result);
-  await createTeamsUpdate(
-    context,
-    JSON.stringify(result),
-    "",
-    "🤖",
-    "attention"
-  );
 }
