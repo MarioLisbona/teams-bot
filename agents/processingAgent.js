@@ -4,12 +4,10 @@ import {
   listExcelFiles,
   processTestingWorksheet,
 } from "./tools/index.js";
-import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
 import { llm, formatLLMResponse } from "./index.js";
-// Load environment variables first
-loadEnvironmentVariables();
 
+// function to create the executor agent
 async function createTestingProcessingAgent() {
   try {
     const executor = await initializeAgentExecutorWithOptions(
@@ -28,11 +26,14 @@ async function createTestingProcessingAgent() {
   }
 }
 
+// function to invoke the agent with the user message and prompt instructions
+
 async function runProcessingAgent(userMessage, context) {
   try {
     const agent = await createTestingProcessingAgent();
 
     // Create a wrapper function that will be properly serialized
+    // The context is needed to send messages back to Teams from inside the processTestingWorksheet tool
     const wrappedContext = {
       sendActivity: async (text) => {
         return await context.sendActivity(text);
@@ -61,6 +62,7 @@ async function runProcessingAgent(userMessage, context) {
     // Format the output for Teams
     const formattedOutput = formatLLMResponse(result.output);
 
+    // Send the formatted Agent output back to Teams
     await createTeamsUpdate(
       context,
       "Agent Response:",

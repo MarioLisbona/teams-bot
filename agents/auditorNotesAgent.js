@@ -8,9 +8,8 @@ import {
   listFolders,
   listExcelFiles,
 } from "./tools/index.js";
-// Load environment variables first
-loadEnvironmentVariables();
 
+// function to create the executor agent
 async function createAuditorNotesAgent() {
   try {
     const executor = await initializeAgentExecutorWithOptions(
@@ -29,11 +28,13 @@ async function createAuditorNotesAgent() {
   }
 }
 
+// function to invoke the agent with the user message and prompt instructions
 async function runAuditorNotesAgent(userMessage, context) {
   try {
     const agent = await createAuditorNotesAgent();
 
     // Create a wrapper function that will be properly serialized
+    // The context is needed to send messages back to Teams from inside the generateAuditorNotes tool
     const wrappedContext = {
       sendActivity: async (text) => {
         return await context.sendActivity(text);
@@ -61,6 +62,7 @@ async function runAuditorNotesAgent(userMessage, context) {
     // Format the output for Teams
     const formattedOutput = formatLLMResponse(result.output);
 
+    // Send the formatted Agent output back to Teams
     await createTeamsUpdate(
       context,
       "Agent Response:",
@@ -83,6 +85,7 @@ async function runAuditorNotesAgent(userMessage, context) {
   }
 }
 
+// function to run the agent with the user message
 export async function runAuditorNotes(userMessage, context) {
   try {
     console.log("Running auditor notes agent");
