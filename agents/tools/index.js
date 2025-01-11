@@ -4,6 +4,7 @@ import {
   listFoldersInDirectory,
   getFileNamesAndIds,
 } from "../../lib/utils/fileStorageAndRetrieval.js";
+import { processRfiWorksheet } from "../../lib/utils/auditProcessing.js";
 
 export const listFolders = new DynamicStructuredTool({
   name: "listFolders",
@@ -62,3 +63,50 @@ export const listExcelFiles = new DynamicStructuredTool({
     }
   },
 });
+
+export const processTestingWorksheet = new DynamicStructuredTool({
+  name: "processTestingWorksheet",
+  description:
+    "Process a Testing worksheet and generate an RFI Response workbook",
+  schema: z.object({
+    selectedFileData: z
+      .object({
+        id: z.string().describe("The SharePoint ID of the workbook"),
+        directoryId: z
+          .string()
+          .describe("The SharePoint ID of the parent directory"),
+        directoryName: z.string().describe("The name of the client directory"),
+        name: z.string().describe("The name of the workbook file"),
+      })
+      .describe("Object containing file and directory information"),
+  }),
+  func: async ({ selectedFileData }, runManager) => {
+    try {
+      // Create a mock context for Teams messages
+      const context = {
+        sendActivity: async (message) => {
+          // Forward Teams messages to the runManager for agent visibility
+          await runManager?.handleText(message);
+        },
+      };
+
+      const result = await processRfiWorksheet(context, selectedFileData);
+
+      if (!result) {
+        return "Processing completed. No RFI data found to process.";
+      }
+
+      return `Successfully created new RFI Response workbook: ${result}`;
+    } catch (error) {
+      return `Error processing RFI worksheet: ${error.message}`;
+    }
+  },
+});
+
+// Update the tools export
+export const tools = [
+  listFolders,
+  listExcelFiles,
+  processRfiWorksheet,
+  // ... other tools
+];
