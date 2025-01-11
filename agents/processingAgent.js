@@ -59,12 +59,13 @@ async function runProcessingAgent(userMessage, context) {
     .map((line) => line.trim()) // Remove extra whitespace
     .join("\n"); // Rejoin with newlines
 
-  // Send the formatted message
-  await context.sendActivity({
-    type: "message",
-    text: formattedOutput,
-    textFormat: "markdown",
-  });
+  await createTeamsUpdate(
+    context,
+    "Agent Response:",
+    formattedOutput,
+    "🤖",
+    "default"
+  );
 
   return result;
 }
