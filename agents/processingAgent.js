@@ -2,6 +2,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { listFolders, listExcelFiles } from "./tools/index.js";
 import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
+import { createTeamsUpdate } from "../lib/utils/utils.js";
 
 // Load environment variables first
 loadEnvironmentVariables();
@@ -57,12 +58,18 @@ async function runProcessingAgent(auditTask) {
   return result;
 }
 
-export async function runProcessing() {
-  console.log("Running processing agent");
-  const result = await runProcessingAgent(
-    "What is the id of the file named 'XXYY - Testing.xlsx'? Can you tell me the ID of the directory the file was found in?"
-  );
-  console.log(result);
-}
+const userMessage =
+  "What is the id of the file named 'XXYY - Testing.xlsx'? Can you tell me the ID of the directory the file was found in?";
 
-runProcessing();
+export async function runProcessing(context, userMessage) {
+  console.log("Running processing agent");
+  const result = await runProcessingAgent(userMessage);
+  console.log(result);
+  await createTeamsUpdate(
+    context,
+    JSON.stringify(result),
+    "",
+    "🤖",
+    "attention"
+  );
+}
