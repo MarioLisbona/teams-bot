@@ -75,27 +75,28 @@ export const processTestingWorksheet = new DynamicStructuredTool({
         directoryId: z
           .string()
           .describe("The SharePoint ID of the parent directory"),
-        directoryName: z.string().describe("The name of the client directory"),
+        directoryName: z
+          .string()
+          .describe("The name of the directory directory"),
         name: z.string().describe("The name of the workbook file"),
       })
       .describe("Object containing file and directory information"),
   }),
   func: async ({ selectedFileData }, runManager) => {
     try {
-      let context = runManager?.context;
+      // Get the Teams context from the global scope
+      const context = global.teamsContext;
 
-      if (!context?.sendActivity) {
-        console.warn(
-          "No valid Teams context available, using fallback messaging"
-        );
-        context = {
-          sendActivity: async (message) => {
-            console.log("Teams Message (fallback):", message);
-            await runManager?.handleText(message);
-            return { id: "fallback-message-id" };
-          },
-        };
+      if (!context || typeof context.sendActivity !== "function") {
+        console.error("No valid Teams context found:", context);
+        throw new Error("Teams context not properly initialized");
       }
+
+      console.log("Context before processing:", {
+        hasSendActivity: typeof context.sendActivity === "function",
+        hasContext: !!context,
+        contextType: typeof context,
+      });
 
       const result = await processRfiWorksheet(context, selectedFileData);
 

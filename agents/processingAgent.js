@@ -46,6 +46,24 @@ async function createTestingProcessingAgent() {
 async function runProcessingAgent(userMessage, context) {
   const agent = await createTestingProcessingAgent();
 
+  // Create a wrapper function that will be properly serialized
+  const wrappedContext = {
+    sendActivity: async (text) => {
+      return await context.sendActivity(text);
+    },
+    turnState: context.turnState || {},
+    activity: context.activity || {},
+  };
+
+  console.log("Wrapped context:", {
+    hasSendActivity: typeof wrappedContext.sendActivity === "function",
+    hasTurnState: !!wrappedContext.turnState,
+    hasActivity: !!wrappedContext.activity,
+  });
+
+  // Store the context in a closure that the tool can access
+  global.teamsContext = wrappedContext;
+
   const result = await agent.invoke({
     input: `You are an assistant in a company that audits energy efficiency installations.
         Complete this task: ${userMessage}.
@@ -56,23 +74,15 @@ async function runProcessingAgent(userMessage, context) {
         - directoryId: the id of the directory the file was found in
         - directoryName: the name of the directory the file was found in
         - name: the name of the file
-        3. Use processTestingWorksheet to process the file and generate an RFI Response workbook, 
-        passing in the selectedFileData and context objects as arguments.
+        3. Use processTestingWorksheet with just the selectedFileData object
         `,
-    context: {
-      sendActivity: context.sendActivity.bind(context),
-      turnState: context.turnState,
-      activity: context.activity,
-    },
   });
   return result;
 }
-
-const userMessage =
-  "What is the id of the file named 'XXYY - Testing.xlsx'? Can you tell me the ID of the directory the file was found in?";
 
 export async function runProcessing(userMessage, context) {
   console.log("Running processing agent");
   const result = await runProcessingAgent(userMessage, context);
   console.log(result);
+  context.sendActivity(JSON.stringify(result.output));
 }
