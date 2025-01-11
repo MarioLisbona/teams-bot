@@ -55,12 +55,6 @@ async function runProcessingAgent(userMessage, context) {
     activity: context.activity || {},
   };
 
-  console.log("Wrapped context:", {
-    hasSendActivity: typeof wrappedContext.sendActivity === "function",
-    hasTurnState: !!wrappedContext.turnState,
-    hasActivity: !!wrappedContext.activity,
-  });
-
   // Store the context in a closure that the tool can access
   global.teamsContext = wrappedContext;
 
@@ -77,6 +71,21 @@ async function runProcessingAgent(userMessage, context) {
         3. Use processTestingWorksheet with just the selectedFileData object
         `,
   });
+
+  // Format the output for Teams
+  const formattedOutput = result.output
+    .split("\n")
+    .filter((line) => line.trim()) // Remove empty lines
+    .map((line) => line.trim()) // Remove extra whitespace
+    .join("\n"); // Rejoin with newlines
+
+  // Send the formatted message
+  await context.sendActivity({
+    type: "message",
+    text: formattedOutput,
+    textFormat: "markdown",
+  });
+
   return result;
 }
 
@@ -84,5 +93,4 @@ export async function runProcessing(userMessage, context) {
   console.log("Running processing agent");
   const result = await runProcessingAgent(userMessage, context);
   console.log(result);
-  context.sendActivity(JSON.stringify(result.output));
 }
