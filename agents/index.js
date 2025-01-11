@@ -22,3 +22,10 @@ export const llm = new ChatOpenAI({
     },
   },
 });
+
+export const formatLLMResponse = (result) => {
+  return result
+    .split("\n")
+    .filter((line) => line.trim())
+    .join("\n");
+};

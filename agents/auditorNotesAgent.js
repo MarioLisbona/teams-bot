@@ -2,7 +2,7 @@ import { initializeAgentExecutorWithOptions } from "langchain/agents";
 
 import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
-import { llm } from "./index.js";
+import { llm, formatLLMResponse } from "./index.js";
 import {
   generateAuditorNotes,
   listFolders,
@@ -12,35 +12,41 @@ import {
 loadEnvironmentVariables();
 
 async function createAuditorNotesAgent() {
-  const executor = await initializeAgentExecutorWithOptions(
-    [listFolders, listExcelFiles, generateAuditorNotes],
-    llm,
-    {
-      agentType: "openai-functions",
-      verbose: true,
-      maxIterations: 10,
-    }
-  );
-  return executor;
+  try {
+    const executor = await initializeAgentExecutorWithOptions(
+      [listFolders, listExcelFiles, generateAuditorNotes],
+      llm,
+      {
+        agentType: "openai-functions",
+        verbose: true,
+        maxIterations: 10,
+      }
+    );
+    return executor;
+  } catch (error) {
+    console.error("Failed to create auditor notes agent:", error);
+    throw new Error("Failed to initialize agent executor");
+  }
 }
 
 async function runAuditorNotesAgent(userMessage, context) {
-  const agent = await createAuditorNotesAgent();
+  try {
+    const agent = await createAuditorNotesAgent();
 
-  // Create a wrapper function that will be properly serialized
-  const wrappedContext = {
-    sendActivity: async (text) => {
-      return await context.sendActivity(text);
-    },
-    turnState: context.turnState || {},
-    activity: context.activity || {},
-  };
+    // Create a wrapper function that will be properly serialized
+    const wrappedContext = {
+      sendActivity: async (text) => {
+        return await context.sendActivity(text);
+      },
+      turnState: context.turnState || {},
+      activity: context.activity || {},
+    };
 
-  // Store the context in a closure that the tool can access
-  global.teamsContext = wrappedContext;
+    // Store the context in a closure that the tool can access
+    global.teamsContext = wrappedContext;
 
-  const result = await agent.invoke({
-    input: `You are an AI assistant in a company that audits energy efficiency installations.
+    const result = await agent.invoke({
+      input: `You are an AI assistant in a company that audits energy efficiency installations.
         Complete this task: ${userMessage}.
         Follow these steps strictly in order:
         1. Use listFolders and listExcelFiles to find the workbook with the exact filename
@@ -50,35 +56,56 @@ async function runAuditorNotesAgent(userMessage, context) {
           For example: "RFI Responses (Back testing Medium) - MLD" - MLD is the client name
         2. Use generateAuditorNotes passing in the context, filename, and workbookId of the located workbook
         `,
-  });
+    });
 
-  // Format the output for Teams
-  const formattedOutput = result.output
-    .split("\n")
-    .filter((line) => line.trim()) // Remove empty lines
-    .map((line) => line.trim()) // Remove extra whitespace
-    .join("\n"); // Rejoin with newlines
+    // Format the output for Teams
+    const formattedOutput = formatLLMResponse(result.output);
 
-  await createTeamsUpdate(
-    context,
-    "Agent Response:",
-    formattedOutput,
-    "🤖",
-    "default"
-  );
+    await createTeamsUpdate(
+      context,
+      "Agent Response:",
+      formattedOutput,
+      "🤖",
+      "default"
+    );
 
-  return result;
+    return result;
+  } catch (error) {
+    console.error("Error in auditor notes agent:", error);
+    await createTeamsUpdate(
+      context,
+      "Error",
+      "Sorry, there was an error processing your request. Please try again later.",
+      "❌",
+      "error"
+    );
+    throw error;
+  }
 }
 
 export async function runAuditorNotes(userMessage, context) {
-  console.log("Running auditor notes agent");
-  await createTeamsUpdate(
-    context,
-    `Querying the auditor notes Agent`,
-    userMessage,
-    "🤖",
-    "default"
-  );
-  const result = await runAuditorNotesAgent(userMessage, context);
-  console.log(result);
+  try {
+    console.log("Running auditor notes agent");
+    await createTeamsUpdate(
+      context,
+      `Querying the auditor notes Agent`,
+      userMessage,
+      "🤖",
+      "default"
+    );
+    const result = await runAuditorNotesAgent(userMessage, context);
+    console.log(result);
+  } catch (error) {
+    console.error("Error in runAuditorNotes:", error);
+    // Only send error message if it hasn't been sent by runAuditorNotesAgent
+    if (error.message !== "Failed to initialize agent executor") {
+      await createTeamsUpdate(
+        context,
+        "Error",
+        "An unexpected error occurred while processing your request.",
+        "❌",
+        "error"
+      );
+    }
+  }
 }
