@@ -5,6 +5,7 @@ import {
   getFileNamesAndIds,
 } from "../../lib/utils/fileStorageAndRetrieval.js";
 import { processRfiWorksheet } from "../../lib/utils/auditProcessing.js";
+import { processAuditorNotes } from "../../lib/handlers/handleAuditWorkbook.js";
 
 export const listFolders = new DynamicStructuredTool({
   name: "listFolders",
@@ -112,10 +113,42 @@ export const processTestingWorksheet = new DynamicStructuredTool({
   },
 });
 
-// Update the tools export
-export const tools = [
-  listFolders,
-  listExcelFiles,
-  processRfiWorksheet,
-  // ... other tools
-];
+export const generateAuditorNotes = new DynamicStructuredTool({
+  name: "generateAuditorNotes",
+  description: "Process an RFI Response workbook and generate auditor notes",
+  schema: z.object({
+    selectedFileData: z
+      .object({
+        id: z.string().describe("The SharePoint ID of the workbook"),
+        name: z.string().describe("The name of the workbook file"),
+      })
+      .describe("Object containing file information"),
+  }),
+  func: async ({ selectedFileData }, runManager) => {
+    try {
+      // Get the Teams context from the global scope
+      const context = global.teamsContext;
+
+      if (!context || typeof context.sendActivity !== "function") {
+        console.error("No valid Teams context found:", context);
+        throw new Error("Teams context not properly initialized");
+      }
+
+      console.log("Processing auditor notes for:", {
+        filename: selectedFileData.name,
+        workbookId: selectedFileData.id,
+      });
+
+      await processAuditorNotes(
+        context,
+        selectedFileData.name,
+        selectedFileData.id
+      );
+
+      return `Successfully generated and added auditor notes to: ${selectedFileData.name}`;
+    } catch (error) {
+      console.error("Error generating auditor notes:", error);
+      return `Error generating auditor notes: ${error.message}`;
+    }
+  },
+});
