@@ -1,4 +1,3 @@
-import { ChatOpenAI } from "@langchain/openai";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import {
   listFolders,
@@ -7,28 +6,9 @@ import {
 } from "./tools/index.js";
 import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
-
+import { llm } from "./index.js";
 // Load environment variables first
 loadEnvironmentVariables();
-
-// Clear any Azure-related environment variables
-delete process.env.AZURE_OPENAI_API_KEY;
-delete process.env.AZURE_OPENAI_API_INSTANCE_NAME;
-delete process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME;
-delete process.env.AZURE_OPENAI_API_VERSION;
-delete process.env.AZURE_OPENAI_API_ENDPOINT;
-
-const llm = new ChatOpenAI({
-  modelName: "gpt-4-turbo-preview",
-  temperature: 0,
-  apiKey: process.env.OPENAI_API_KEY,
-  configuration: {
-    baseURL: "https://api.openai.com/v1",
-    defaultHeaders: {
-      "api-key": process.env.OPENAI_API_KEY,
-    },
-  },
-});
 
 async function createTestingProcessingAgent() {
   const executor = await initializeAgentExecutorWithOptions(
