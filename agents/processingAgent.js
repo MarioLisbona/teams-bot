@@ -16,7 +16,7 @@ async function createTestingProcessingAgent() {
       {
         agentType: "openai-functions",
         verbose: true,
-        maxIterations: 5,
+        maxIterations: 10,
       }
     );
     return executor;

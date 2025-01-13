@@ -18,7 +18,7 @@ async function createAuditorNotesAgent() {
       {
         agentType: "openai-functions",
         verbose: true,
-        maxIterations: 5,
+        maxIterations: 10,
       }
     );
     return executor;
