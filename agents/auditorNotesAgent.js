@@ -56,6 +56,8 @@ async function runAuditorNotesAgent(userMessage, context) {
           - The file name contains the client name which is also the directory name
           For example: "RFI Responses (Back testing Medium) - MLD" - MLD is the client name
         2. Use generateAuditorNotes passing in the context, filename, and workbookId of the located workbook
+
+        If you are unable to find the file, notify the user that the file was not found.
         `,
     });
 

@@ -56,6 +56,8 @@ async function runProcessingAgent(userMessage, context) {
           - directoryName: the name of the directory the file was found in
           - name: the name of the file
           3. Use processTestingWorksheet with just the selectedFileData object
+
+          If you are unable to find the file, notify the user that the file was not found.
           `,
     });
 
