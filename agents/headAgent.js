@@ -4,7 +4,7 @@ import {
   listExcelFiles,
   processTestingWorksheet,
   generateAuditorNotes,
-  // ... any other tools
+  sendToWorkflowAgentTool,
 } from "./tools/index.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
 import { llm, formatLLMResponse } from "./index.js";
@@ -17,6 +17,7 @@ async function createHeadAgent() {
         listExcelFiles,
         processTestingWorksheet,
         generateAuditorNotes,
+        sendToWorkflowAgentTool,
       ],
       llm,
       {
@@ -50,13 +51,15 @@ async function runHeadAgent(userMessage, context) {
 
         # Workflow Agent:
         If the message is similar to these example user messages:
-        **"Start the audit for Job ID <job id>"**
-        **"Start the audit job <job id>"**
-        **"Start processing the evidence pack documents for Job ID <job id>"**
-        **"Start processing the evidence pack docs for jobID <job id>"**
+        **"Start the audit for job id <job id>"**
+        **"Start the audit for job ID <job id>"**
+        **"Start the audit for jobID <job id>"**
+        **"Start processing the evidence pack documents for job id <job id>"**
+        **"Start processing the evidence pack docs for job id <job id>"**
 
         ### Steps:
-        1. Notify the user that the audit job has been started.
+        1. Notify the user that the audit job has sent to the workflow agent.
+        2. Use sendToWorkflowAgentTool to send the message and context details to the workflow agent.
 
         # Processing Agent:
         If the message is similar to these example user messages:
@@ -129,7 +132,7 @@ async function runHeadAgent(userMessage, context) {
 
 export async function callHeadAgent(userMessage, context) {
   try {
-    console.log("Running head agent");
+    console.log("Calling head agent");
     await createTeamsUpdate(
       context,
       "Processing Request",
