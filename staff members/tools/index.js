@@ -6,9 +6,10 @@ import {
 } from "../../lib/utils/fileStorageAndRetrieval.js";
 import { processRfiWorksheet } from "../../lib/utils/auditProcessing.js";
 import { processAuditorNotes } from "../../lib/handlers/handleAuditWorkbook.js";
+import { sendToWorkflowAgent } from "../index.js";
 
-export const listFolders = new DynamicStructuredTool({
-  name: "listFolders",
+export const listFoldersTool = new DynamicStructuredTool({
+  name: "listFoldersTool",
   description: "List all folders in a specified SharePoint directory",
   schema: z.object({
     folderId: z
@@ -37,8 +38,8 @@ export const listFolders = new DynamicStructuredTool({
   },
 });
 
-export const listExcelFiles = new DynamicStructuredTool({
-  name: "listExcelFiles",
+export const listExcelFilesTool = new DynamicStructuredTool({
+  name: "listExcelFilesTool",
   description: "List all Excel files in a specified SharePoint directory",
   schema: z.object({
     folderId: z
@@ -65,8 +66,8 @@ export const listExcelFiles = new DynamicStructuredTool({
   },
 });
 
-export const processTestingWorksheet = new DynamicStructuredTool({
-  name: "processTestingWorksheet",
+export const processTestingWorksheetTool = new DynamicStructuredTool({
+  name: "processTestingWorksheetTool",
   description:
     "Process a Testing worksheet and generate an RFI Response workbook",
   schema: z.object({
@@ -93,12 +94,6 @@ export const processTestingWorksheet = new DynamicStructuredTool({
         throw new Error("Teams context not properly initialized");
       }
 
-      console.log("Context before processing:", {
-        hasSendActivity: typeof context.sendActivity === "function",
-        hasContext: !!context,
-        contextType: typeof context,
-      });
-
       const result = await processRfiWorksheet(context, selectedFileData);
 
       if (!result) {
@@ -113,8 +108,8 @@ export const processTestingWorksheet = new DynamicStructuredTool({
   },
 });
 
-export const generateAuditorNotes = new DynamicStructuredTool({
-  name: "generateAuditorNotes",
+export const generateAuditorNotesTool = new DynamicStructuredTool({
+  name: "generateAuditorNotesTool",
   description: "Process an RFI Response workbook and generate auditor notes",
   schema: z.object({
     selectedFileData: z
@@ -149,6 +144,38 @@ export const generateAuditorNotes = new DynamicStructuredTool({
     } catch (error) {
       console.error("Error generating auditor notes:", error);
       return `Error generating auditor notes: ${error.message}`;
+    }
+  },
+});
+
+export const sendToWorkflowAgentTool = new DynamicStructuredTool({
+  name: "sendToWorkflowAgentTool",
+  description: "Send message and context details to the workflow agent",
+  schema: z.object({
+    message: z.string().describe("The message to send to the workflow agent"),
+  }),
+  func: async ({ message }) => {
+    try {
+      // Get the Teams context from the global scope
+      const context = global.teamsContext;
+
+      if (!context || !context.activity) {
+        console.error("No valid Teams context found:", context);
+        throw new Error("Teams context not properly initialized");
+      }
+
+      const contextDetails = {
+        serviceUrl: context.activity.serviceUrl,
+        conversationId: context.activity.conversation.id,
+        channelId: context.activity.channelId,
+        tenantId: context.activity.conversation.tenantId,
+      };
+
+      await sendToWorkflowAgent(contextDetails, message);
+      return `Successfully sent message to workflow agent`;
+    } catch (error) {
+      console.error("Error sending to workflow agent:", error);
+      return `Failed to send to workflow agent: ${error.message}`;
     }
   },
 });

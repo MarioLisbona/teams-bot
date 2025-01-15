@@ -1,19 +1,19 @@
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 
-import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
-import { createTeamsUpdate } from "../lib/utils/utils.js";
-import { llm, formatLLMResponse } from "./index.js";
+import { loadEnvironmentVariables } from "../../lib/environment/setupEnvironment.js";
+import { createTeamsUpdate } from "../../lib/utils/utils.js";
+import { llm, formatLLMResponse } from "../index.js";
 import {
-  generateAuditorNotes,
-  listFolders,
-  listExcelFiles,
-} from "./tools/index.js";
+  generateAuditorNotesTool,
+  listFoldersTool,
+  listExcelFilesTool,
+} from "../tools/index.js";
 
 // function to create the executor agent
 async function createAuditorNotesAgent() {
   try {
     const executor = await initializeAgentExecutorWithOptions(
-      [listFolders, listExcelFiles, generateAuditorNotes],
+      [listFoldersTool, listExcelFilesTool, generateAuditorNotesTool],
       llm,
       {
         agentType: "openai-functions",

@@ -40,6 +40,22 @@ try {
     res.send("Server is running");
   });
 
+  // Workflow agent route
+  app.post("/workflow-agent", (req, res) => {
+    const { serviceUrl, conversationId, channelId, tenantId, userMessage } =
+      req.body;
+
+    console.log("Workflow Agent Request Received from Teams:", {
+      serviceUrl,
+      conversationId,
+      channelId,
+      tenantId,
+      userMessage,
+    });
+
+    res.status(200).json({ message: "Workflow request received" });
+  });
+
   // Use the routes
   app.use("/api", createMessageRoutes(adapter));
   app.use("/api", createValidateRoutes(adapter));

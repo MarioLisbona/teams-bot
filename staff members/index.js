@@ -1,4 +1,5 @@
 import { ChatOpenAI } from "@langchain/openai";
+import axios from "axios";
 
 /**
  * Azure OpenAI chat model instance configured with zero temperature for deterministic responses.
@@ -24,3 +25,17 @@ export const formatLLMResponse = (result) => {
     .filter((line) => line.trim())
     .join("\n");
 };
+
+export async function sendToWorkflowAgent(messageDetails, userMessage) {
+  try {
+    const response = await axios.post("http://localhost:3978/workflow-agent", {
+      ...messageDetails,
+      userMessage,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error sending to workflow agent:", error);
+    throw error;
+  }
+}
