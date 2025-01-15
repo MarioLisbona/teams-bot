@@ -55,8 +55,8 @@ async function runHeadAgent(userMessage, context) {
         **"Start processing the evidence pack documents for Job ID <job id>"**
         **"Start processing the evidence pack docs for jobID <job id>"**
 
-        Notify the user that the audit job has been started.
-
+        ### Steps:
+        1. Notify the user that the audit job has been started.
 
         # Processing Agent:
         If the message is similar to these example user messages:
@@ -64,15 +64,18 @@ async function runHeadAgent(userMessage, context) {
         **"Process the testing worksheet in the file <file name>"**
         **"Process RFI for <file name>"**
 
-        The file name will be in this format: <client name> <file name>.xlsx
+        The file name will be in this format: <client name> Testing.xlsx or a similar format with "Testing" in the file name.
         E.g - XXYY Testing.xlsx
-        The client name in the file format will be the name of the client directory that the file is in.
+        The client name in the file format will be the name of the client directory that the file is located in. 
+        In the example above, the client name is XXYY and the directory name is XXYY.
 
-        Follow these steps:
+        ### Steps:
         1. Use listFolders and listExcelFiles to find the workbook
         2. Create a selectedFileData object with id, directoryId, directoryName, and name
         3. Use processTestingWorksheet with the selectedFileData object
 
+        > **Note:** If you can't find the requested client directory or exact filename, notify the user and do not process any other files.
+        > **Note:** If you cant find the exact but find a similar file, notify the user of the similar filenames and do not process any other files.
 
         # Auditor Notes Agent:
         If the message is similar to these example user messages:
@@ -85,17 +88,19 @@ async function runHeadAgent(userMessage, context) {
         and sometimes it will be in this format: RFI Responses - size - <client name>.xlsx 
         
         In this last format size is S, M, L, XL, etc.
-        E.g - RFI Responses - S - XXYY.xlsx
+        E.g - RFI Responses - S - MLD.xlsx
+        The client name in the file format will be the name of the client directory that the file is located in.
+        In the example above, the client name is MLD and the directory name is MLD.
 
-        The client name in the file format will be the name of the client directory that the file is in.
-
-        Follow these steps:
+        ### Steps:
         1. Use listFolders and listExcelFiles to find the workbook
         2. Use generateAuditorNotes with the context, filename, and workbookId
 
-        User message: ${userMessage}
+        > **Note:** If you can't find the requested client directory or exact filename, notify the user and do not process any other files.
+        > **Note:** If you cant find the exact but find a similar file, notify the user of the similar filenames and do not process any other files.
+
+        # User message: ${userMessage}
         
-        If you can't find the requested file, notify the user.
         Execute only the relevant task based on the user's message.`,
     });
 
