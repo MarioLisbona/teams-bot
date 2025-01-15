@@ -93,12 +93,6 @@ export const processTestingWorksheet = new DynamicStructuredTool({
         throw new Error("Teams context not properly initialized");
       }
 
-      console.log("Context before processing:", {
-        hasSendActivity: typeof context.sendActivity === "function",
-        hasContext: !!context,
-        contextType: typeof context,
-      });
-
       const result = await processRfiWorksheet(context, selectedFileData);
 
       if (!result) {
