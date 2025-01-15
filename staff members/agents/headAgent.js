@@ -5,9 +5,9 @@ import {
   processTestingWorksheetTool,
   generateAuditorNotesTool,
   sendToWorkflowAgentTool,
-} from "./tools/index.js";
-import { createTeamsUpdate } from "../lib/utils/utils.js";
-import { llm, formatLLMResponse } from "./index.js";
+} from "../tools/index.js";
+import { createTeamsUpdate } from "../../lib/utils/utils.js";
+import { llm, formatLLMResponse } from "../index.js";
 
 async function createHeadAgent() {
   try {

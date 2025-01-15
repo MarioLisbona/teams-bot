@@ -3,9 +3,9 @@ import {
   listFoldersTool,
   listExcelFilesTool,
   processTestingWorksheetTool,
-} from "./tools/index.js";
-import { createTeamsUpdate } from "../lib/utils/utils.js";
-import { llm, formatLLMResponse } from "./index.js";
+} from "../tools/index.js";
+import { createTeamsUpdate } from "../../lib/utils/utils.js";
+import { llm, formatLLMResponse } from "../index.js";
 
 // function to create the executor agent
 async function createTestingProcessingAgent() {

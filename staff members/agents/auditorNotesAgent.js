@@ -1,13 +1,13 @@
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 
-import { loadEnvironmentVariables } from "../lib/environment/setupEnvironment.js";
-import { createTeamsUpdate } from "../lib/utils/utils.js";
-import { llm, formatLLMResponse } from "./index.js";
+import { loadEnvironmentVariables } from "../../lib/environment/setupEnvironment.js";
+import { createTeamsUpdate } from "../../lib/utils/utils.js";
+import { llm, formatLLMResponse } from "../index.js";
 import {
   generateAuditorNotesTool,
   listFoldersTool,
   listExcelFilesTool,
-} from "./tools/index.js";
+} from "../tools/index.js";
 
 // function to create the executor agent
 async function createAuditorNotesAgent() {
