@@ -48,6 +48,17 @@ async function runHeadAgent(userMessage, context) {
       input: `You are an AI assistant in a company that audits energy efficiency installations.
         Based on the user's message, determine which task needs to be performed and execute it:
 
+        # Workflow Agent:
+        If the message is similar to these example user messages:
+        **"Start the audit for Job ID <job id>"**
+        **"Start the audit job <job id>"**
+        **"Start processing the evidence pack documents for Job ID <job id>"**
+        **"Start processing the evidence pack docs for jobID <job id>"**
+
+        Notify the user that the audit job has been started.
+
+
+        # Processing Agent:
         If the message is similar to these example user messages:
         **"Process the rfi in the file <file name>"**
         **"Process the testing worksheet in the file <file name>"**
@@ -62,6 +73,8 @@ async function runHeadAgent(userMessage, context) {
         2. Create a selectedFileData object with id, directoryId, directoryName, and name
         3. Use processTestingWorksheet with the selectedFileData object
 
+
+        # Auditor Notes Agent:
         If the message is similar to these example user messages:
         **"Generate auditor notes for <file name>"**
         **"Process the rfi client responses in <file name>"**
