@@ -1,9 +1,9 @@
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import {
-  listFolders,
-  listExcelFiles,
-  processTestingWorksheet,
-  generateAuditorNotes,
+  listFoldersTool,
+  listExcelFilesTool,
+  processTestingWorksheetTool,
+  generateAuditorNotesTool,
   sendToWorkflowAgentTool,
 } from "./tools/index.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
@@ -13,10 +13,10 @@ async function createHeadAgent() {
   try {
     const executor = await initializeAgentExecutorWithOptions(
       [
-        listFolders,
-        listExcelFiles,
-        processTestingWorksheet,
-        generateAuditorNotes,
+        listFoldersTool,
+        listExcelFilesTool,
+        processTestingWorksheetTool,
+        generateAuditorNotesTool,
         sendToWorkflowAgentTool,
       ],
       llm,

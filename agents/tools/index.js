@@ -7,8 +7,9 @@ import {
 import { processRfiWorksheet } from "../../lib/utils/auditProcessing.js";
 import { processAuditorNotes } from "../../lib/handlers/handleAuditWorkbook.js";
 import { sendToWorkflowAgent } from "../index.js";
-export const listFolders = new DynamicStructuredTool({
-  name: "listFolders",
+
+export const listFoldersTool = new DynamicStructuredTool({
+  name: "listFoldersTool",
   description: "List all folders in a specified SharePoint directory",
   schema: z.object({
     folderId: z
@@ -37,8 +38,8 @@ export const listFolders = new DynamicStructuredTool({
   },
 });
 
-export const listExcelFiles = new DynamicStructuredTool({
-  name: "listExcelFiles",
+export const listExcelFilesTool = new DynamicStructuredTool({
+  name: "listExcelFilesTool",
   description: "List all Excel files in a specified SharePoint directory",
   schema: z.object({
     folderId: z
@@ -65,8 +66,8 @@ export const listExcelFiles = new DynamicStructuredTool({
   },
 });
 
-export const processTestingWorksheet = new DynamicStructuredTool({
-  name: "processTestingWorksheet",
+export const processTestingWorksheetTool = new DynamicStructuredTool({
+  name: "processTestingWorksheetTool",
   description:
     "Process a Testing worksheet and generate an RFI Response workbook",
   schema: z.object({
@@ -107,8 +108,8 @@ export const processTestingWorksheet = new DynamicStructuredTool({
   },
 });
 
-export const generateAuditorNotes = new DynamicStructuredTool({
-  name: "generateAuditorNotes",
+export const generateAuditorNotesTool = new DynamicStructuredTool({
+  name: "generateAuditorNotesTool",
   description: "Process an RFI Response workbook and generate auditor notes",
   schema: z.object({
     selectedFileData: z
@@ -148,7 +149,7 @@ export const generateAuditorNotes = new DynamicStructuredTool({
 });
 
 export const sendToWorkflowAgentTool = new DynamicStructuredTool({
-  name: "sendToWorkflow",
+  name: "sendToWorkflowAgentTool",
   description: "Send message and context details to the workflow agent",
   schema: z.object({
     message: z.string().describe("The message to send to the workflow agent"),

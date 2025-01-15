@@ -1,8 +1,8 @@
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import {
-  listFolders,
-  listExcelFiles,
-  processTestingWorksheet,
+  listFoldersTool,
+  listExcelFilesTool,
+  processTestingWorksheetTool,
 } from "./tools/index.js";
 import { createTeamsUpdate } from "../lib/utils/utils.js";
 import { llm, formatLLMResponse } from "./index.js";
@@ -11,7 +11,7 @@ import { llm, formatLLMResponse } from "./index.js";
 async function createTestingProcessingAgent() {
   try {
     const executor = await initializeAgentExecutorWithOptions(
-      [listFolders, listExcelFiles, processTestingWorksheet],
+      [listFoldersTool, listExcelFilesTool, processTestingWorksheetTool],
       llm,
       {
         agentType: "openai-functions",
